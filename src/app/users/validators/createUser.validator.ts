@@ -13,7 +13,9 @@ export const createUserValidator = [
     .isLength({ min: 3, max: 50 })
     .withMessage('Username must be between 3 and 50 characters')
     .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage('Username can only contain letters, numbers, underscores, and hyphens'),
+    .withMessage(
+      'Username can only contain letters, numbers, underscores, and hyphens'
+    ),
 
   body('email')
     .trim()
@@ -29,7 +31,9 @@ export const createUserValidator = [
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .withMessage(
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    ),
 
   body('firstName')
     .optional()
@@ -47,9 +51,4 @@ export const createUserValidator = [
     .optional()
     .isIn(['admin', 'user', 'moderator'])
     .withMessage('Role must be one of: admin, user, moderator'),
-
-  body('verified')
-    .optional()
-    .isBoolean()
-    .withMessage('Verified must be a boolean'),
 ];

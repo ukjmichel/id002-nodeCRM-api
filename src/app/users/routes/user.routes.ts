@@ -1,3 +1,4 @@
+// src/app/users/routes/user.routes.ts
 /**
  * User Routes
  * Defines all API endpoints for user management
@@ -13,6 +14,9 @@ import {
   bulkCreateUsersController,
   countUsersController,
   validateUserPasswordController,
+  updatePasswordController,
+  verifyUserController,
+  unverifyUserController,
 } from '../controllers/index.js';
 import {
   createUserValidator,
@@ -21,6 +25,7 @@ import {
   bulkCreateUsersValidator,
   validatePasswordValidator,
   queryParamsValidator,
+  updatePasswordValidator,
 } from '../validators/index.js';
 
 const router = Router();
@@ -61,18 +66,36 @@ router.get('/', queryParamsValidator, findAllUsersController);
 router.get('/:id', userIdValidator, findUserByIdController);
 
 /**
- * @route   PUT /api/users/:id
- * @desc    Update a user by ID
+ * @route   PATCH /api/users/:id
+ * @desc    Update a user by ID (profile info only, not password or verified)
  * @access  Private (User or Admin)
  */
-router.put('/:id', updateUserValidator, updateUserController);
+router.patch('/:id', updateUserValidator, updateUserController);
 
 /**
- * @route   DELETE /api/users/:id
- * @desc    Delete a user by ID
+ * @route   PATCH /api/users/:id/password
+ * @desc    Update a user's password
+ * @access  Private (User or Admin)
+ */
+router.patch(
+  '/:id/password',
+  updatePasswordValidator,
+  updatePasswordController
+);
+
+/**
+ * @route   PATCH /api/users/:id/verify
+ * @desc    Verify a user account
+ * @access  Private (Admin only or verification token)
+ */
+router.patch('/:id/verify', userIdValidator, verifyUserController);
+
+/**
+ * @route   PATCH /api/users/:id/unverify
+ * @desc    Unverify a user account
  * @access  Private (Admin only)
  */
-router.delete('/:id', userIdValidator, deleteUserController);
+router.patch('/:id/unverify', userIdValidator, unverifyUserController);
 
 /**
  * @route   POST /api/users/:id/validate-password
@@ -84,5 +107,12 @@ router.post(
   validatePasswordValidator,
   validateUserPasswordController
 );
+
+/**
+ * @route   DELETE /api/users/:id
+ * @desc    Delete a user by ID
+ * @access  Private (Admin only)
+ */
+router.delete('/:id', userIdValidator, deleteUserController);
 
 export default router;

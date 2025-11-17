@@ -1,14 +1,12 @@
+// src/app/users/services/unverifyUser.ts
 /**
  * Unverify User Service
  * Marks a user as unverified
  */
 
-
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-
 import { UserModel } from '../models/user.model.js';
-import { updateUser } from './updateUser.js';
 
 /**
  * Mark a user as unverified
@@ -29,12 +27,17 @@ export const unverifyUser = async (
   userId: string
 ): Promise<ApiResponse<UserModel>> => {
   try {
-    const updatedUser = await updateUser(userId, {
-      verified: false,
-    });
+    const record = await UserModel.findByPk(userId);
+
+    if (!record) {
+      throw new NotFoundError(`User with ID ${userId} not found`);
+    }
+
+    await record.update({ verified: false });
 
     return {
-      ...updatedUser,
+      success: true,
+      data: record,
       message: 'User unverified successfully',
     };
   } catch (error) {

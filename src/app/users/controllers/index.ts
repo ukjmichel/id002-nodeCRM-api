@@ -1,3 +1,4 @@
+// src/app/users/controllers/index.ts
 /**
  * User Controllers Index
  * Central export point for all user controllers
@@ -11,3 +12,7 @@ export { deleteUserController } from './deleteUser.controller.js';
 export { bulkCreateUsersController } from './bulkCreateUsers.controller.js';
 export { countUsersController } from './countUsers.controller.js';
 export { validateUserPasswordController } from './validateUserPassword.controller.js';
+export { updatePasswordController } from './updatePassword.controller.js';
+export { verifyUserController } from './verifyUser.controller.js';
+export { unverifyUserController } from './unverifyUser.controller.js';
+

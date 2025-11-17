@@ -51,9 +51,4 @@ export const bulkCreateUsersValidator = [
     .optional()
     .isIn(['admin', 'user', 'moderator'])
     .withMessage('Role must be one of: admin, user, moderator'),
-
-  body('users.*.verified')
-    .optional()
-    .isBoolean()
-    .withMessage('Verified must be a boolean'),
 ];

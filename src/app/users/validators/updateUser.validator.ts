@@ -1,6 +1,8 @@
+// src/app/users/validators/updateUser.validator.ts
 /**
  * Update User Validator
  * Validates request data for updating a user
+ * Note: verified field is not allowed in updates
  */
 
 import { body, param } from 'express-validator';
@@ -18,7 +20,9 @@ export const updateUserValidator = [
     .isLength({ min: 3, max: 50 })
     .withMessage('Username must be between 3 and 50 characters')
     .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage('Username can only contain letters, numbers, underscores, and hyphens'),
+    .withMessage(
+      'Username can only contain letters, numbers, underscores, and hyphens'
+    ),
 
   body('email')
     .optional()
@@ -26,13 +30,6 @@ export const updateUserValidator = [
     .isEmail()
     .withMessage('Must be a valid email address')
     .normalizeEmail(),
-
-  body('password')
-    .optional()
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
 
   body('firstName')
     .optional()
@@ -50,9 +47,4 @@ export const updateUserValidator = [
     .optional()
     .isIn(['admin', 'user', 'moderator'])
     .withMessage('Role must be one of: admin, user, moderator'),
-
-  body('verified')
-    .optional()
-    .isBoolean()
-    .withMessage('Verified must be a boolean'),
 ];

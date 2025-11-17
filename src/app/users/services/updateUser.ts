@@ -1,6 +1,8 @@
+// src/app/users/services/updateUser.ts
 /**
  * Update User Service
  * Updates a user record by ID
+ * Note: verified status and password cannot be changed through this service
  */
 
 import { UpdateOptions } from 'sequelize';
@@ -10,9 +12,10 @@ import { UserModel } from '../models/user.model.js';
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 
-
 /**
  * Update a user by ID
+ * The verified and password fields are automatically excluded from updates
+ * Use dedicated services to change these sensitive fields
  *
  * @param id - User ID
  * @param data - Data to update
@@ -23,10 +26,24 @@ import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
  *
  * @example
  * ```typescript
+ * // Allowed updates:
  * const updatedUser = await updateUser('user-uuid-here', {
  *   firstName: 'Jane',
- *   verified: true
+ *   lastName: 'Doe',
+ *   email: 'jane@example.com',
+ *   username: 'janedoe'
  * });
+ *
+ * // These fields will be IGNORED:
+ * await updateUser('user-uuid-here', {
+ *   verified: true,  // verified field is ignored
+ *   password: 'newPass123' // password field is ignored
+ * });
+ *
+ * // Use dedicated services instead:
+ * await verifyUser('user-uuid-here');           // To verify
+ * await unverifyUser('user-uuid-here');         // To unverify
+ * await updatePassword('user-uuid-here', 'newPass123'); // To change password
  * ```
  */
 export const updateUser = async (
@@ -41,7 +58,13 @@ export const updateUser = async (
       throw new NotFoundError(`User with ID ${id} not found`);
     }
 
-    await record.update(data as any, options);
+    // Remove protected fields from update data to prevent modification
+    // Use dedicated services for these fields:
+    // - verifyUser() / unverifyUser() for verified status
+    // - updatePassword() for password changes
+    const { verified, password, ...updateData } = data;
+
+    await record.update(updateData as any, options);
 
     return {
       success: true,

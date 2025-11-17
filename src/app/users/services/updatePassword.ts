@@ -1,14 +1,12 @@
+// src/app/users/services/updatePassword.ts
 /**
  * Update Password Service
  * Updates a user's password
  */
 
-
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-
 import { UserModel } from '../models/user.model.js';
-import { updateUser } from './updateUser.js';
 
 /**
  * Update a user's password
@@ -42,12 +40,19 @@ export const updatePassword = async (
       );
     }
 
-    const updatedUser = await updateUser(userId, {
-      password: newPassword,
-    });
+    // Find the user
+    const record = await UserModel.findByPk(userId);
+
+    if (!record) {
+      throw new NotFoundError(`User with ID ${userId} not found`);
+    }
+
+    // Update password directly (will be hashed by BeforeUpdate hook)
+    await record.update({ password: newPassword });
 
     return {
-      ...updatedUser,
+      success: true,
+      data: record,
       message: 'Password updated successfully',
     };
   } catch (error) {

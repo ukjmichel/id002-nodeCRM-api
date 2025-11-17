@@ -20,11 +20,11 @@ import {
   BeforeUpdate,
 } from 'sequelize-typescript';
 
-import { UserModel } from '../../users/models/user.model';
+import { UserModel } from '../../users/models/user.model.js';
 import {
   RoleAttributes,
   RoleCreationAttributes,
-} from '../interfaces/role.interface';
+} from '../interfaces/role.interface.js';
 
 export enum RoleType {
   ADMINISTRATOR = 'administrator',
@@ -78,9 +78,6 @@ export class RoleModel
 
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
-
-  @BelongsTo(() => UserModel)
-  declare user: UserModel;
 
   @BeforeCreate
   @BeforeUpdate

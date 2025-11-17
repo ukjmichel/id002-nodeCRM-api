@@ -1,19 +1,21 @@
+// src/app/users/services/bulkCreateUsers.ts
 /**
  * Bulk Create Users Service
  * Creates multiple user records at once
+ * All users are created as unverified by default
  */
 
 import { ValidationError } from '../../../core/errors/index.js';
-import {ApiResponse, BulkCreateOptions } from "../../../core/interfaces/index.js";
+import {
+  ApiResponse,
+  BulkCreateOptions,
+} from '../../../core/interfaces/index.js';
 import { UserAttributes } from '../interfaces/user.interface.js';
 import { UserModel } from '../models/user.model.js';
 
-
-
-
-
 /**
  * Bulk create users
+ * All users will be created with verified: false regardless of input
  *
  * @param dataArray - Array of user data to create
  * @param options - Sequelize bulk create options
@@ -23,8 +25,8 @@ import { UserModel } from '../models/user.model.js';
  * @example
  * ```typescript
  * const users = await bulkCreateUsers([
- *   { username: 'user1', email: 'user1@example.com', ... },
- *   { username: 'user2', email: 'user2@example.com', ... }
+ *   { username: 'user1', email: 'user1@example.com', password: 'pass123', ... },
+ *   { username: 'user2', email: 'user2@example.com', password: 'pass456', ... }
  * ], { validate: true });
  * ```
  */
@@ -33,7 +35,17 @@ export const bulkCreateUsers = async (
   options?: BulkCreateOptions
 ): Promise<ApiResponse<UserModel[]>> => {
   try {
-    const records = await UserModel.bulkCreate(dataArray as any[], options);
+    // Ensure all users are created as unverified
+    const normalizedData = dataArray.map((user) => ({
+      ...user,
+      verified: false,
+    }));
+
+    const records = await UserModel.bulkCreate(
+      normalizedData as any[],
+      options
+    );
+
     return {
       success: true,
       data: records,
