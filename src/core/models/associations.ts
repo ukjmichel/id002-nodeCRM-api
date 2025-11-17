@@ -1,6 +1,8 @@
 // src/models/associations.ts
 import { Sequelize } from 'sequelize-typescript';
 import { UserModel } from '../../app/users/models/user.model.js';
+import { RoleModel } from '../../app/authorisation/models/role.model.js';
+
 
 // Core domain models
 
@@ -13,5 +15,21 @@ import { UserModel } from '../../app/users/models/user.model.js';
  */
 export function registerAssociations(sequelize: Sequelize) {
   // 1) Register all models used by the app
-  sequelize.addModels([UserModel]);
+  sequelize.addModels([UserModel, RoleModel]);
+
+  // 2) Define associations
+  // User <-> Role (one-to-one relationship)
+  UserModel.hasOne(RoleModel, {
+    foreignKey: 'userId',
+    as: 'role',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+
+  RoleModel.belongsTo(UserModel, {
+    foreignKey: 'userId',
+    as: 'user',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
 }
