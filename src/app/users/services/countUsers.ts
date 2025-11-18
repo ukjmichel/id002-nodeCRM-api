@@ -3,6 +3,7 @@
  * Counts users with optional filters
  */
 
+import { Transaction } from 'sequelize';
 import { UserModel } from '../models/user.model.js';
 import { ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
@@ -17,24 +18,38 @@ import {
  *
  * @param where - Where clause
  * @param options - Sequelize count options
+ * @param transaction - Optional transaction object
  * @returns Count result
  * @throws {ValidationError} When count fails
  *
  * @example
  * ```typescript
+ * // Without transaction
  * const result = await countUsers({ verified: true });
  * console.log(`There are ${result.data} verified users`);
+ *
+ * // With transaction
+ * await withTransaction(async (t) => {
+ *   const result = await countUsers({ verified: true }, undefined, t);
+ *   console.log(`There are ${result.data} verified users`);
+ * });
  * ```
  */
 export const countUsers = async (
   where: WhereOptions<Attributes<UserModel>> = {},
-  options?: CountOptions
+  options?: CountOptions,
+  transaction?: Transaction
 ): Promise<ApiResponse<number>> => {
   try {
-    const count = await UserModel.count({
+    const countOptions: any = {
       where,
-      ...options,
-    });
+      ...(options || {}),
+    };
+    if (transaction) {
+      countOptions.transaction = transaction;
+    }
+
+    const count = (await UserModel.count(countOptions)) as unknown as number;
     return {
       success: true,
       data: count,

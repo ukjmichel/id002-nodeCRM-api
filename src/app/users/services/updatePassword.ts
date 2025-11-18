@@ -4,6 +4,7 @@
  * Updates a user's password
  */
 
+import { Transaction } from 'sequelize';
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
 import { UserModel } from '../models/user.model.js';
@@ -14,22 +15,30 @@ import { UserModel } from '../models/user.model.js';
  *
  * @param userId - User's ID
  * @param newPassword - New plain text password
+ * @param transaction - Optional transaction object
  * @returns Updated user record
  * @throws {NotFoundError} When user is not found
  * @throws {ValidationError} When update fails or password is invalid
  *
  * @example
  * ```typescript
+ * // Without transaction
  * const updatedUser = await updatePassword(
  *   'user-uuid-here',
  *   'newSecurePassword123'
  * );
- * console.log('Password updated successfully');
+ *
+ * // With transaction
+ * await withTransaction(async (t) => {
+ *   await updatePassword('user-uuid-here', 'newSecurePassword123', t);
+ *   // Other operations...
+ * });
  * ```
  */
 export const updatePassword = async (
   userId: string,
-  newPassword: string
+  newPassword: string,
+  transaction?: Transaction
 ): Promise<ApiResponse<UserModel>> => {
   try {
     // Basic password validation
@@ -41,14 +50,22 @@ export const updatePassword = async (
     }
 
     // Find the user
-    const record = await UserModel.findByPk(userId);
+    const findOptions: any = {};
+    if (transaction) {
+      findOptions.transaction = transaction;
+    }
+    const record = await UserModel.findByPk(userId, findOptions);
 
     if (!record) {
       throw new NotFoundError(`User with ID ${userId} not found`);
     }
 
     // Update password directly (will be hashed by BeforeUpdate hook)
-    await record.update({ password: newPassword });
+    const updateOptions: any = {};
+    if (transaction) {
+      updateOptions.transaction = transaction;
+    }
+    await record.update({ password: newPassword }, updateOptions);
 
     return {
       success: true,

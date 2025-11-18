@@ -22,6 +22,7 @@ import swaggerSpec from './docs/swagger.js';
 import { errorHandler } from './core/middlewares/errorHandler.js';
 
 import userRouter from './app/users/routes/user.routes.js';
+import authRouter from './app/auth/routes/auth.route.js';
 
 export const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 /* API routes                                                                 */
 /* -------------------------------------------------------------------------- */
 app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
 
 /* -------------------------------------------------------------------------- */
 /* Multer error normalization (optional)                                      */

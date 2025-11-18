@@ -9,6 +9,10 @@ import { validateUserPassword } from '../services/validateUserPassword.js';
 /**
  * Validate a user's password
  * @route POST /api/users/:id/validate-password
+ *
+ * @remarks
+ * Password validation is a read operation, so transactions are not needed.
+ * This is typically used for authentication or re-authentication flows.
  */
 export const validateUserPasswordController = async (
   req: Request,
@@ -18,7 +22,7 @@ export const validateUserPasswordController = async (
   try {
     const { id } = req.params;
     const { password } = req.body;
-    
+
     const result = await validateUserPassword(id, password);
     res.status(200).json(result);
   } catch (error) {

@@ -9,6 +9,10 @@ import { findAllUsers } from '../services/findAllUsers.js';
 /**
  * Get all users with optional filters and pagination
  * @route GET /api/users
+ *
+ * @remarks
+ * Read operations typically don't need transactions unless you need
+ * consistent reads across multiple queries (using READ COMMITTED or higher isolation).
  */
 export const findAllUsersController = async (
   req: Request,
@@ -17,7 +21,7 @@ export const findAllUsersController = async (
 ): Promise<void> => {
   try {
     const { where, limit, offset, order, include } = req.query;
-    
+
     const options = {
       ...(where && { where: JSON.parse(where as string) }),
       ...(limit && { limit: parseInt(limit as string, 10) }),

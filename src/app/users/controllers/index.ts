@@ -2,6 +2,10 @@
 /**
  * User Controllers Index
  * Central export point for all user controllers
+ *
+ * @remarks
+ * Controllers now support transaction patterns for complex operations.
+ * See individual controller files for transaction usage examples.
  */
 
 export { createUserController } from './createUser.controller.js';
@@ -15,4 +19,3 @@ export { validateUserPasswordController } from './validateUserPassword.controlle
 export { updatePasswordController } from './updatePassword.controller.js';
 export { verifyUserController } from './verifyUser.controller.js';
 export { unverifyUserController } from './unverifyUser.controller.js';
-
