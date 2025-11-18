@@ -2,20 +2,21 @@
 /**
  * Login Service
  * Authenticates user and generates tokens
+ * Uses username for login (not email)
  */
 
 import { Response } from 'express';
 import { ValidationError } from '../../../core/errors/index.js';
-import { findUserByEmail } from '../../users/services/findUserByEmail.js';
+import { findUserByUsername } from '../../users/services/findUserByUsername.js';
 import { AuthResponse, LoginDTO } from '../interfaces/auth.interface.js';
 import { generateTokens } from './generateTokens.service.js';
 import { setAuthCookies } from './sethAuthCookies.service.js';
 
-
 /**
  * Authenticate user and generate tokens
+ * Login is performed using username only
  *
- * @param loginData - User login credentials
+ * @param loginData - User login credentials (username + password)
  * @param res - Express response object to set cookies
  * @returns Authentication response with user data only (tokens set in cookies)
  * @throws {ValidationError} When credentials are invalid
@@ -23,7 +24,7 @@ import { setAuthCookies } from './sethAuthCookies.service.js';
  * @example
  * ```typescript
  * const result = await login({
- *   email: 'john@example.com',
+ *   username: 'johndoe',
  *   password: 'SecurePass123'
  * }, res);
  * ```
@@ -33,17 +34,35 @@ export const login = async (
   res: Response
 ): Promise<Omit<AuthResponse, 'data'> & { data: { user: any } }> => {
   try {
-    const { email, password } = loginData;
+    const { username, password } = loginData;
 
-    // Find user by email
-    const userResponse = await findUserByEmail(email);
+    // Validate input
+    if (!username || !password) {
+      throw new ValidationError(
+        'Authentication failed',
+        'Username and password are required'
+      );
+    }
+
+    // Find user by username
+    let userResponse;
+    try {
+      userResponse = await findUserByUsername(username);
+    } catch (error) {
+      // Don't reveal whether the username exists
+      throw new ValidationError(
+        'Authentication failed',
+        'Invalid username or password'
+      );
+    }
+
     const user = userResponse.data;
 
-    // Check if user exists
+    // Check if user exists (additional safety check)
     if (!user) {
       throw new ValidationError(
         'Authentication failed',
-        'Invalid email or password'
+        'Invalid username or password'
       );
     }
 
@@ -52,9 +71,18 @@ export const login = async (
     if (!isValidPassword) {
       throw new ValidationError(
         'Authentication failed',
-        'Invalid email or password'
+        'Invalid username or password'
       );
     }
+
+    // Optional: Check if user is verified
+    // Uncomment if you want to enforce email verification before login
+    // if (!user.verified) {
+    //   throw new ValidationError(
+    //     'Authentication failed',
+    //     'Please verify your email address before logging in'
+    //   );
+    // }
 
     // Generate tokens
     const tokens = generateTokens(user);

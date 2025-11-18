@@ -5,7 +5,7 @@
  */
 
 export interface LoginDTO {
-  email: string;
+  username: string; // Changed from email to username
   password: string;
 }
 
