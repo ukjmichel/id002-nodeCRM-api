@@ -78,7 +78,7 @@ router.get('/user/:userId', userIdValidator, findRoleByUserIdController);
  * @desc    Update a role by user ID
  * @access  Private (Admin only)
  */
-router.put('/:userId', updateRoleValidator, updateRoleController);
+router.patch('/:userId', updateRoleValidator, updateRoleController);
 
 /**
  * @route   PATCH /api/roles/:userId/activate
