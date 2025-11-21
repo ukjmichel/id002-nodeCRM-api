@@ -3,8 +3,6 @@
  * Central export point for all business controllers
  */
 
-
-
 export { createBusinessController } from './createBusiness.controller.js';
 export { findAllBusinessesController } from './findAllBusinesses.controller.js';
 export { findBusinessByIdController } from './findBusinessById.controller.js';

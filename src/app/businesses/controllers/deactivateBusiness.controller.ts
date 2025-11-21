@@ -28,7 +28,7 @@ export const deactivateBusinessController = async (
     const { id } = req.params;
 
     // Parse closure date from request body if provided
-    const { closureDate } = req.body;
+    const { closureDate } = req.body || {};
     const parsedClosureDate = closureDate ? new Date(closureDate) : undefined;
 
     // Validate closure date format if provided

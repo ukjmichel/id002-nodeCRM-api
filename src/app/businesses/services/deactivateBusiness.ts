@@ -84,9 +84,12 @@ export const deactivateBusiness = async (
     // ========================================================================
 
     // Validate closure date if provided
-    let finalClosureDate = closureDate || new Date();
+    let finalClosureDate: Date;
 
-    if (closureDate) {
+    if (!closureDate) {
+      finalClosureDate = new Date();
+      finalClosureDate.setHours(0, 0, 0, 0);
+    } else {
       const closureDateObj = new Date(closureDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
