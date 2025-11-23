@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { UserModel } from '../../app/users/models/user.model.js';
 import { RoleModel } from '../../app/authorisation/models/role.model.js';
 import { BusinessModel } from '../../app/businesses/models/business.model.js';
+import { BusinessItemModel } from '../../app/business-items/models/business-item.model.js';
 
 // Core domain models
 
@@ -15,7 +16,7 @@ import { BusinessModel } from '../../app/businesses/models/business.model.js';
  */
 export function registerAssociations(sequelize: Sequelize) {
   // 1) Register all models used by the app
-  sequelize.addModels([UserModel, RoleModel, BusinessModel]);
+  sequelize.addModels([UserModel, RoleModel, BusinessModel,BusinessItemModel]);
 
   // 2) Define associations
 
@@ -49,4 +50,13 @@ export function registerAssociations(sequelize: Sequelize) {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   });
+
+  BusinessModel.hasMany(BusinessItemModel, {
+    foreignKey: 'businessId',
+    as: 'businessesItems',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  });
+
+  
 }

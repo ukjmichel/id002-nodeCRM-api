@@ -23,7 +23,7 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
-import { BusinessModel } from '../../businesses/models/business.model';
+import { BusinessModel } from '../../businesses/models/business.model.js';
 
 // =========================================================================
 // Enums
