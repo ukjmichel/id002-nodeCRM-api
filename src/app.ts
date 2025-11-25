@@ -26,6 +26,7 @@ import authRouter from './app/auth/routes/auth.route.js';
 import roleRouter from './app/authorisation/routes/role.routes.js';
 import businessRouter from './app/businesses/routes/business.routes.js';
 import businessItemRouter from './app/business-items/routes/business-item.routes.js';
+import businessItemOptionGroupRouter from './app/business-item-option-groups/routes/business-item-option-group.routes.js';
 
 export const app = express();
 
@@ -71,6 +72,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/authorisations', roleRouter);
 app.use('/api/businesses', businessRouter);
 app.use('/api/business-items', businessItemRouter);
+app.use('/api/business-item-option-groups', businessItemOptionGroupRouter);
 
 /* -------------------------------------------------------------------------- */
 /* Multer error normalization (optional)                                      */

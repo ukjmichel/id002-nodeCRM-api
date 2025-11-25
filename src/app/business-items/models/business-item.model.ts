@@ -24,6 +24,10 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { BusinessModel } from '../../businesses/models/business.model.js';
+import {
+  BusinessItemAttributes,
+  BusinessItemCreationAttributes,
+} from '../interfaces/business-item.interface.js';
 
 // =========================================================================
 // Enums
@@ -64,133 +68,6 @@ export enum SpicyLevel {
   HOT = 'hot',
   EXTRA_HOT = 'extra_hot',
 }
-
-// =========================================================================
-// Interfaces
-// =========================================================================
-
-export interface BusinessItemAttributes {
-  itemId: string;
-  businessId: string;
-
-  // Basic Information
-  name: string;
-  description?: string;
-  shortDescription?: string;
-  type: ItemType;
-  category?: ItemCategory;
-
-  // Pricing
-  price: number;
-  currency: string;
-  discountPrice?: number;
-  discountStartDate?: Date;
-  discountEndDate?: Date;
-
-  // Dietary Information
-  isHalal: boolean;
-  isKosher: boolean;
-  isVegan: boolean;
-  isVegetarian: boolean;
-  isGlutenFree: boolean;
-  isLactoseFree: boolean;
-  isOrganic: boolean;
-  isBio: boolean;
-  isHomemade: boolean;
-
-  // Allergen Information
-  containsNuts: boolean;
-  containsPeanuts: boolean;
-  containsSoy: boolean;
-  containsEggs: boolean;
-  containsFish: boolean;
-  containsShellfish: boolean;
-  containsWheat: boolean;
-  containsMilk: boolean;
-  containsSesame: boolean;
-  containsSulfites: boolean;
-  allergenNotes?: string;
-
-  // Taste & Preparation
-  spicyLevel: SpicyLevel;
-  isRaw: boolean;
-  isCooked: boolean;
-  isFried: boolean;
-  isGrilled: boolean;
-  isSteamed: boolean;
-
-  // Nutritional Information (per serving)
-  servingSize?: string;
-  calories?: number;
-  protein?: number;
-  carbohydrates?: number;
-  fat?: number;
-  fiber?: number;
-  sugar?: number;
-  sodium?: number;
-
-  // Availability
-  available: boolean;
-  availableForDelivery: boolean;
-  availableForPickup: boolean;
-  availableForDineIn: boolean;
-  stockQuantity?: number;
-  lowStockThreshold?: number;
-
-  // Ordering
-  preparationTime?: number; // in minutes
-  minOrderQuantity: number;
-  maxOrderQuantity?: number;
-
-  // Display
-  imageUrl?: string;
-  thumbnailUrl?: string;
-  displayOrder: number;
-  featured: boolean;
-
-  // Metadata
-  sku?: string;
-  barcode?: string;
-  tags?: string[];
-
-  // Timestamps
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-}
-
-export interface BusinessItemCreationAttributes
-  extends Optional<
-    BusinessItemAttributes,
-    | 'itemId'
-    | 'description'
-    | 'shortDescription'
-    | 'category'
-    | 'discountPrice'
-    | 'discountStartDate'
-    | 'discountEndDate'
-    | 'allergenNotes'
-    | 'servingSize'
-    | 'calories'
-    | 'protein'
-    | 'carbohydrates'
-    | 'fat'
-    | 'fiber'
-    | 'sugar'
-    | 'sodium'
-    | 'stockQuantity'
-    | 'lowStockThreshold'
-    | 'preparationTime'
-    | 'maxOrderQuantity'
-    | 'imageUrl'
-    | 'thumbnailUrl'
-    | 'sku'
-    | 'barcode'
-    | 'tags'
-    | 'createdAt'
-    | 'updatedAt'
-  > {}
-
-type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 @Table({
   tableName: 'business_items',
@@ -794,6 +671,12 @@ export class BusinessItemModel
     allowNull: true,
   })
   declare tags?: string[];
+
+  @Column({
+    type: DataType.JSON,
+    allowNull: true,
+  })
+  declare optionGroupIds?: string[];
 
   // =========================================================================
   // Timestamps

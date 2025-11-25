@@ -95,6 +95,7 @@ export interface BusinessItemAttributes {
   sku?: string;
   barcode?: string;
   tags?: string[];
+  optionGroupIds?: string[]; // Array of optionId references from BusinessItemOptionGroup model
 
   // Timestamps
   readonly createdAt: Date;
@@ -166,3 +167,37 @@ export interface BusinessItemSearchCriteria {
   // Tags
   tags?: string[];
 }
+
+export interface BusinessItemCreationAttributes
+  extends Optional<
+    BusinessItemAttributes,
+    | 'itemId'
+    | 'description'
+    | 'shortDescription'
+    | 'category'
+    | 'discountPrice'
+    | 'discountStartDate'
+    | 'discountEndDate'
+    | 'allergenNotes'
+    | 'servingSize'
+    | 'calories'
+    | 'protein'
+    | 'carbohydrates'
+    | 'fat'
+    | 'fiber'
+    | 'sugar'
+    | 'sodium'
+    | 'stockQuantity'
+    | 'lowStockThreshold'
+    | 'preparationTime'
+    | 'maxOrderQuantity'
+    | 'imageUrl'
+    | 'thumbnailUrl'
+    | 'sku'
+    | 'barcode'
+    | 'tags'
+    | 'createdAt'
+    | 'updatedAt'
+  > {}
+
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
