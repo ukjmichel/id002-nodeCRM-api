@@ -11,7 +11,7 @@ import {
   UpdateQuery,
   QueryOptions,
 } from 'mongoose';
-import { NotFoundError, ValidationError } from '../errors/';
+import { NotFoundError, ValidationError } from '../errors/index.js';
 
 /**
  * Standard API response structure
