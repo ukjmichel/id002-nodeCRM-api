@@ -3,7 +3,8 @@
  * =============================================================================
  * Menu Interface
  * =============================================================================
- * TypeScript interface for business menus
+ * TypeScript interface for business menus containing items with their
+ * quantities, active options, and default item selections.
  * =============================================================================
  */
 
@@ -35,7 +36,7 @@ export interface IMenu {
  * Interface with document methods
  */
 export interface IMenuDocument extends IMenu, Document {
-  // Item methods
+  // Instance methods - Item management
   addItem(
     itemId: string,
     quantity?: number,
@@ -48,13 +49,13 @@ export interface IMenuDocument extends IMenu, Document {
   updateItemQuantity(itemId: string, quantity: number): boolean;
   getItemCount(): number;
 
-  // Active options methods
+  // Instance methods - Active Options management
   addActiveOption(itemId: string, optionId: string): boolean;
   removeActiveOption(itemId: string, optionId: string): boolean;
   hasActiveOption(itemId: string, optionId: string): boolean;
   getActiveOptions(itemId: string): string[];
 
-  // Default items methods
+  // Instance methods - Default Items management
   addDefaultItem(itemId: string, defaultItemId: string): boolean;
   removeDefaultItem(itemId: string, defaultItemId: string): boolean;
   hasDefaultItem(itemId: string, defaultItemId: string): boolean;
