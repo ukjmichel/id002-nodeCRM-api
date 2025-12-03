@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { ItemOptionService } from '../services/index.js';
+import { ItemOptionService } from '../services/item-options/index.js';
 
 /**
  * Set the active status of an item in an option

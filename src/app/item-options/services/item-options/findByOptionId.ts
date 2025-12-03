@@ -2,11 +2,14 @@
  * Find option by optionId
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
 // import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 
 /**
@@ -28,14 +31,10 @@ export const findByOptionId = async (
       );
     }
 
-    const optionOption = await ItemOptionsModel.findByOptionId(
-      optionId.trim()
-    );
+    const optionOption = await ItemOptionsModel.findByOptionId(optionId.trim());
 
     if (!optionOption) {
-      throw new NotFoundError(
-        `option with optionId '${optionId}' not found`
-      );
+      throw new NotFoundError(`option with optionId '${optionId}' not found`);
     }
 
     return {

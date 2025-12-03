@@ -2,11 +2,12 @@
  * Get the number of items in an Option
  */
 
-
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { ItemOptionsModel } from '../models/item-option.model.js';
-
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
 
 /**
  * Get the number of items in an Option
@@ -35,14 +36,10 @@ export const getItemCount = async (
     }
 
     // Find the Option
-    const optionOption = await ItemOptionsModel.findByOptionId(
-      optionId.trim()
-    );
+    const optionOption = await ItemOptionsModel.findByOptionId(optionId.trim());
 
     if (!optionOption) {
-      throw new NotFoundError(
-        `Option with optionId '${optionId}' not found`
-      );
+      throw new NotFoundError(`Option with optionId '${optionId}' not found`);
     }
 
     const itemCount = optionOption.getItemCount();

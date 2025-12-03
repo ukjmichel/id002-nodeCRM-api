@@ -5,11 +5,7 @@
 
 import type { CreateOptions } from 'sequelize';
 import { ValidationError } from '../../../core/errors/index.js';
-import {
-  ItemModel,
-  ItemType,
-  SpicyLevel,
-} from '../models/item.model.js';
+import { ItemModel, ItemType, SpicyLevel } from '../models/item.model.js';
 import { BusinessModel } from '../../businesses/models/business.model.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
 import { ItemAttributes } from '../interfaces/item.interface.js';
@@ -308,7 +304,7 @@ export const createItem = async (
 
       // Ordering defaults
       minOrderQuantity: data.minOrderQuantity ?? 1,
-      displayOrder: data.displayOrder ?? 0,
+      sortOrder: data.sortOrder ?? 0,
       featured: data.featured ?? false,
     };
 

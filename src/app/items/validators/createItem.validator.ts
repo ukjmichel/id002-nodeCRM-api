@@ -4,35 +4,12 @@
  */
 
 import { body } from 'express-validator';
-
-const VALID_ITEM_TYPES = [
-  'food',
-  'drink',
-  'dessert',
-  'appetizer',
-  'main_course',
-  'side_dish',
-  'snack',
-  'combo',
-  'other',
-];
-
-const VALID_ITEM_CATEGORIES = [
-  'meat',
-  'poultry',
-  'seafood',
-  'vegetable',
-  'dairy',
-  'bakery',
-  'beverage',
-  'frozen',
-  'prepared',
-  'other',
-];
-
-const VALID_SPICY_LEVELS = ['none', 'mild', 'medium', 'hot', 'extra_hot'];
-
-const VALID_CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
+import {
+  VALID_ITEM_TYPES,
+  VALID_ITEM_CATEGORIES,
+  VALID_SPICY_LEVELS,
+  VALID_CURRENCIES,
+} from './constants.js';
 
 export const createItemValidator = [
   // Required fields
@@ -76,7 +53,9 @@ export const createItemValidator = [
   body('category')
     .optional()
     .isIn(VALID_ITEM_CATEGORIES)
-    .withMessage(`Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`),
+    .withMessage(
+      `Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`
+    ),
 
   // Pricing
   body('currency')
@@ -149,10 +128,7 @@ export const createItemValidator = [
     .isBoolean()
     .withMessage('isOrganic must be a boolean'),
 
-  body('isBio')
-    .optional()
-    .isBoolean()
-    .withMessage('isBio must be a boolean'),
+  body('isBio').optional().isBoolean().withMessage('isBio must be a boolean'),
 
   body('isHomemade')
     .optional()
@@ -220,12 +196,11 @@ export const createItemValidator = [
   body('spicyLevel')
     .optional()
     .isIn(VALID_SPICY_LEVELS)
-    .withMessage(`Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`),
+    .withMessage(
+      `Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`
+    ),
 
-  body('isRaw')
-    .optional()
-    .isBoolean()
-    .withMessage('isRaw must be a boolean'),
+  body('isRaw').optional().isBoolean().withMessage('isRaw must be a boolean'),
 
   body('isCooked')
     .optional()
@@ -336,8 +311,14 @@ export const createItemValidator = [
     .isInt({ min: 1 })
     .withMessage('Maximum order quantity must be at least 1')
     .custom((value, { req }) => {
-      if (value && req.body.minOrderQuantity && value < req.body.minOrderQuantity) {
-        throw new Error('Maximum order quantity must be >= minimum order quantity');
+      if (
+        value &&
+        req.body.minOrderQuantity &&
+        value < req.body.minOrderQuantity
+      ) {
+        throw new Error(
+          'Maximum order quantity must be >= minimum order quantity'
+        );
       }
       return true;
     }),
@@ -355,10 +336,10 @@ export const createItemValidator = [
     .isURL()
     .withMessage('Thumbnail URL must be a valid URL'),
 
-  body('displayOrder')
+  body('sortOrder')
     .optional()
     .isInt({ min: 0 })
-    .withMessage('Display order must be a non-negative integer'),
+    .withMessage('Sort order must be a non-negative integer'),
 
   body('featured')
     .optional()
@@ -378,10 +359,7 @@ export const createItemValidator = [
     .isLength({ max: 50 })
     .withMessage('Barcode must not exceed 50 characters'),
 
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
 
   body('tags.*')
     .optional()

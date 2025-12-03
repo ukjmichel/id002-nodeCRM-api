@@ -5,35 +5,12 @@
  */
 
 import { body, param } from 'express-validator';
-
-const VALID_ITEM_TYPES = [
-  'food',
-  'drink',
-  'dessert',
-  'appetizer',
-  'main_course',
-  'side_dish',
-  'snack',
-  'combo',
-  'other',
-];
-
-const VALID_ITEM_CATEGORIES = [
-  'meat',
-  'poultry',
-  'seafood',
-  'vegetable',
-  'dairy',
-  'bakery',
-  'beverage',
-  'frozen',
-  'prepared',
-  'other',
-];
-
-const VALID_SPICY_LEVELS = ['none', 'mild', 'medium', 'hot', 'extra_hot'];
-
-const VALID_CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
+import {
+  VALID_ITEM_TYPES,
+  VALID_ITEM_CATEGORIES,
+  VALID_SPICY_LEVELS,
+  VALID_CURRENCIES,
+} from './constants.js';
 
 export const updateItemValidator = [
   param('id')
@@ -69,7 +46,9 @@ export const updateItemValidator = [
   body('category')
     .optional()
     .isIn(VALID_ITEM_CATEGORIES)
-    .withMessage(`Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`),
+    .withMessage(
+      `Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`
+    ),
 
   // Pricing
   body('price')
@@ -133,10 +112,7 @@ export const updateItemValidator = [
     .isBoolean()
     .withMessage('isOrganic must be a boolean'),
 
-  body('isBio')
-    .optional()
-    .isBoolean()
-    .withMessage('isBio must be a boolean'),
+  body('isBio').optional().isBoolean().withMessage('isBio must be a boolean'),
 
   body('isHomemade')
     .optional()
@@ -204,12 +180,11 @@ export const updateItemValidator = [
   body('spicyLevel')
     .optional()
     .isIn(VALID_SPICY_LEVELS)
-    .withMessage(`Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`),
+    .withMessage(
+      `Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`
+    ),
 
-  body('isRaw')
-    .optional()
-    .isBoolean()
-    .withMessage('isRaw must be a boolean'),
+  body('isRaw').optional().isBoolean().withMessage('isRaw must be a boolean'),
 
   body('isCooked')
     .optional()
@@ -333,10 +308,10 @@ export const updateItemValidator = [
     .isURL()
     .withMessage('Thumbnail URL must be a valid URL'),
 
-  body('displayOrder')
+  body('sortOrder')
     .optional()
     .isInt({ min: 0 })
-    .withMessage('Display order must be a non-negative integer'),
+    .withMessage('Sort order must be a non-negative integer'),
 
   body('featured')
     .optional()
@@ -356,10 +331,7 @@ export const updateItemValidator = [
     .isLength({ max: 50 })
     .withMessage('Barcode must not exceed 50 characters'),
 
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
 
   body('tags.*')
     .optional()

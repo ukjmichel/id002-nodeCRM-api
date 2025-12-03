@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { ItemOptionService } from '../services/index.js';
+import { ItemOptionService } from '../services/item-options/index.js';
 
 /**
  * Check if an option group contains a specific item
@@ -21,10 +21,7 @@ export const hasItemController = async (
 ): Promise<void> => {
   try {
     const { optionId, itemId } = req.params;
-    const result = await ItemOptionService.hasItem(
-      optionId,
-      itemId
-    );
+    const result = await ItemOptionService.hasItem(optionId, itemId);
     res.status(200).json(result);
   } catch (error) {
     next(error);

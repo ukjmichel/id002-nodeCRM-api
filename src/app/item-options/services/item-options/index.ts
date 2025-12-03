@@ -7,12 +7,12 @@
  * =============================================================================
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
 import {
   IItemOptions,
   IItemOptionsDocument,
   IOptionItem,
-} from '../interfaces/item-option.interface.js';
+} from '../../interfaces/item-option.interface.js';
 
 // Import custom service methods
 import { findByOptionId } from './findByOptionId.js';
@@ -43,7 +43,7 @@ import { validateItemId } from './validateItemId.js';
 import createMongooseCrudService, {
   ApiResponse,
   IMongooseCrudService,
-} from '../../../core/utils/mongooseCrudServiceGenerator.js';
+} from '../../../../core/utils/mongooseCrudServiceGenerator.js';
 
 /**
  * Extended Business Item Option Service Interface
@@ -301,6 +301,6 @@ export type {
   IItemOptions,
   IItemOptionsDocument,
   IOptionItem,
-} from '../interfaces/item-option.interface.js';
+} from '../../interfaces/item-option.interface.js';
 
 export type { BulkUpdateItemInput } from './bulkUpdateItems.js';

@@ -36,7 +36,7 @@ export const findItemsByBusinessId = async (
     const result = await findAllItems({
       where: { businessId },
       order: [
-        ['displayOrder', 'ASC'],
+        ['sortOrder', 'ASC'],
         ['name', 'ASC'],
       ],
     });

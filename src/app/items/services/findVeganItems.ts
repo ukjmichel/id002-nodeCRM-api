@@ -34,7 +34,7 @@ export const findVeganItems = async (
     const result = await findAllItems({
       where,
       order: [
-        ['displayOrder', 'ASC'],
+        ['sortOrder', 'ASC'],
         ['name', 'ASC'],
       ],
     });

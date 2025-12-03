@@ -2,12 +2,15 @@
  * Add a single item to an option
  */
 
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
-import { validateItemId } from './validateItemId.js';
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
-import { ItemOptionsModel } from '../models/item-option.model.js';
+import { validateItemId } from '../validateItemId.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
 
 /**
  * Add a single item to an option
@@ -75,9 +78,7 @@ export const addItemToOption = async (
     const optionOption = await ItemOptionsModel.findByOptionId(optionId.trim());
 
     if (!optionOption) {
-      throw new NotFoundError(
-        `option with optionId '${optionId}' not found`
-      );
+      throw new NotFoundError(`option with optionId '${optionId}' not found`);
     }
 
     // Check if item already exists

@@ -4,33 +4,11 @@
  */
 
 import { body } from 'express-validator';
-
-const VALID_ITEM_TYPES = [
-  'food',
-  'drink',
-  'dessert',
-  'appetizer',
-  'main_course',
-  'side_dish',
-  'snack',
-  'combo',
-  'other',
-];
-
-const VALID_ITEM_CATEGORIES = [
-  'meat',
-  'poultry',
-  'seafood',
-  'vegetable',
-  'dairy',
-  'bakery',
-  'beverage',
-  'frozen',
-  'prepared',
-  'other',
-];
-
-const VALID_SPICY_LEVELS = ['none', 'mild', 'medium', 'hot', 'extra_hot'];
+import {
+  VALID_ITEM_TYPES,
+  VALID_ITEM_CATEGORIES,
+  VALID_SPICY_LEVELS,
+} from './constants.js';
 
 export const searchItemsValidator = [
   // Text search
@@ -52,8 +30,12 @@ export const searchItemsValidator = [
     .isArray()
     .withMessage('Type must be an array')
     .custom((value) => {
-      if (value.some((t: string) => !VALID_ITEM_TYPES.includes(t))) {
-        throw new Error('Invalid item type in array');
+      if (value.some((t: string) => !VALID_ITEM_TYPES.includes(t as any))) {
+        throw new Error(
+          `Invalid item type in array. Valid types: ${VALID_ITEM_TYPES.join(
+            ', '
+          )}`
+        );
       }
       return true;
     }),
@@ -63,8 +45,14 @@ export const searchItemsValidator = [
     .isArray()
     .withMessage('Category must be an array')
     .custom((value) => {
-      if (value.some((c: string) => !VALID_ITEM_CATEGORIES.includes(c))) {
-        throw new Error('Invalid category in array');
+      if (
+        value.some((c: string) => !VALID_ITEM_CATEGORIES.includes(c as any))
+      ) {
+        throw new Error(
+          `Invalid category in array. Valid categories: ${VALID_ITEM_CATEGORIES.join(
+            ', '
+          )}`
+        );
       }
       return true;
     }),
@@ -122,10 +110,7 @@ export const searchItemsValidator = [
     .isBoolean()
     .withMessage('isOrganic must be a boolean'),
 
-  body('isBio')
-    .optional()
-    .isBoolean()
-    .withMessage('isBio must be a boolean'),
+  body('isBio').optional().isBoolean().withMessage('isBio must be a boolean'),
 
   body('isHomemade')
     .optional()
@@ -189,8 +174,12 @@ export const searchItemsValidator = [
     .isArray()
     .withMessage('Spicy level must be an array')
     .custom((value) => {
-      if (value.some((l: string) => !VALID_SPICY_LEVELS.includes(l))) {
-        throw new Error('Invalid spicy level in array');
+      if (value.some((l: string) => !VALID_SPICY_LEVELS.includes(l as any))) {
+        throw new Error(
+          `Invalid spicy level in array. Valid levels: ${VALID_SPICY_LEVELS.join(
+            ', '
+          )}`
+        );
       }
       return true;
     }),
@@ -198,7 +187,9 @@ export const searchItemsValidator = [
   body('maxSpicyLevel')
     .optional()
     .isIn(VALID_SPICY_LEVELS)
-    .withMessage(`Max spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`),
+    .withMessage(
+      `Max spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`
+    ),
 
   // Availability filters
   body('available')
@@ -259,13 +250,7 @@ export const searchItemsValidator = [
     .withMessage('Max fat must be a positive number'),
 
   // Tags
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
 
-  body('tags.*')
-    .optional()
-    .isString()
-    .withMessage('Each tag must be a string'),
+  body('tags.*').optional().isString().withMessage('Each tag must be a string'),
 ];

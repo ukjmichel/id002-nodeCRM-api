@@ -4,35 +4,12 @@
  */
 
 import { body } from 'express-validator';
-
-const VALID_ITEM_TYPES = [
-  'food',
-  'drink',
-  'dessert',
-  'appetizer',
-  'main_course',
-  'side_dish',
-  'snack',
-  'combo',
-  'other',
-];
-
-const VALID_ITEM_CATEGORIES = [
-  'meat',
-  'poultry',
-  'seafood',
-  'vegetable',
-  'dairy',
-  'bakery',
-  'beverage',
-  'frozen',
-  'prepared',
-  'other',
-];
-
-const VALID_SPICY_LEVELS = ['none', 'mild', 'medium', 'hot', 'extra_hot'];
-
-const VALID_CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
+import {
+  VALID_ITEM_TYPES,
+  VALID_ITEM_CATEGORIES,
+  VALID_SPICY_LEVELS,
+  VALID_CURRENCIES,
+} from './constants.js';
 
 export const bulkCreateItemsValidator = [
   body('items')
@@ -66,7 +43,9 @@ export const bulkCreateItemsValidator = [
   body('items.*.category')
     .optional()
     .isIn(VALID_ITEM_CATEGORIES)
-    .withMessage(`Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`),
+    .withMessage(
+      `Category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`
+    ),
 
   body('items.*.currency')
     .optional()
@@ -76,7 +55,9 @@ export const bulkCreateItemsValidator = [
   body('items.*.spicyLevel')
     .optional()
     .isIn(VALID_SPICY_LEVELS)
-    .withMessage(`Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`),
+    .withMessage(
+      `Spicy level must be one of: ${VALID_SPICY_LEVELS.join(', ')}`
+    ),
 
   body('items.*.isHalal')
     .optional()

@@ -1,37 +1,48 @@
 /**
- * Update the max quantity of an item in an option
+ * Set the active status of an item in an option
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
 import { validateItemId } from './validateItemId.js';
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
 
 /**
- * Update the max quantity of an item in an option
+ * Set the active status of an item in an option
  *
  * @param optionId - Option identifier
  * @param itemId - Business item ID to update
- * @param maxQuantity - New max quantity value (1-100)
+ * @param active - New active status
  * @returns Updated option
  * @throws {NotFoundError} When option or item is not found
  * @throws {ValidationError} When validation fails or operation fails
  *
  * @example
  * ```typescript
- * const result = await updateItemMaxQuantity(
+ * // Deactivate an item
+ * const result = await setItemActiveStatus(
  *   'size-options-001',
  *   '550e8400-e29b-41d4-a716-446655440001',
- *   5
+ *   false
+ * );
+ *
+ * // Activate an item
+ * const result = await setItemActiveStatus(
+ *   'size-options-001',
+ *   '550e8400-e29b-41d4-a716-446655440001',
+ *   true
  * );
  * ```
  */
-export const updateItemMaxQuantity = async (
+export const setItemActiveStatus = async (
   optionId: string,
   itemId: string,
-  maxQuantity: number
+  active: boolean
 ): Promise<ApiResponse<IItemOptionsDocument>> => {
   try {
     // Validate inputs
@@ -53,17 +64,10 @@ export const updateItemMaxQuantity = async (
       );
     }
 
-    if (typeof maxQuantity !== 'number' || !Number.isInteger(maxQuantity)) {
+    if (typeof active !== 'boolean') {
       throw new ValidationError(
-        'Invalid maxQuantity',
-        'Max quantity must be an integer'
-      );
-    }
-
-    if (maxQuantity < 1 || maxQuantity > 100) {
-      throw new ValidationError(
-        'Invalid maxQuantity',
-        'Max quantity must be between 1 and 100'
+        'Invalid active status',
+        'Active status must be a boolean'
       );
     }
 
@@ -81,21 +85,21 @@ export const updateItemMaxQuantity = async (
       );
     }
 
-    // Update max quantity using instance method
-    option.updateMaxQuantity(itemId, maxQuantity);
+    // Update active status using instance method
+    option.setItemActive(itemId, active);
     await option.save();
 
     return {
       success: true,
       data: option,
-      message: `Max quantity updated to ${maxQuantity} successfully`,
+      message: `Item ${active ? 'activated' : 'deactivated'} successfully`,
     };
   } catch (error: any) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
       throw error;
     }
     throw new ValidationError(
-      'Error updating item max quantity',
+      'Error updating item active status',
       error.message || String(error)
     );
   }

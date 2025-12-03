@@ -84,14 +84,13 @@ export interface ItemAttributes {
   // Display
   imageUrl?: string;
   thumbnailUrl?: string;
-  displayOrder: number;
+  sortOrder: number;
   featured: boolean;
 
   // Metadata
   sku?: string;
   barcode?: string;
   tags?: string[];
-  optionGroupIds?: string[]; // Array of optionId references from ItemOptionGroup model
 
   // Timestamps
   readonly createdAt: Date;

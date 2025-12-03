@@ -2,11 +2,14 @@
  * Get all active items from an option
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IOptionItem } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IOptionItem } from '../../interfaces/item-option.interface.js';
 
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
 
 /**
  * Get all active items from an option

@@ -2,11 +2,14 @@
  * Remove all items from an option
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
 
 /**
  * Remove all items from an option
@@ -29,14 +32,10 @@ export const clearAllItems = async (
     }
 
     // Find the option
-    const optionOption = await ItemOptionsModel.findByOptionId(
-      optionId.trim()
-    );
+    const optionOption = await ItemOptionsModel.findByOptionId(optionId.trim());
 
     if (!optionOption) {
-      throw new NotFoundError(
-        `option with optionId '${optionId}' not found`
-      );
+      throw new NotFoundError(`option with optionId '${optionId}' not found`);
     }
 
     const previousCount = optionOption.items.length;

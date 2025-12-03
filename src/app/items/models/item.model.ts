@@ -44,6 +44,7 @@ export enum ItemType {
   COMBO = 'combo',
   SAUCE = 'sauce',
   SUPPLEMENT = 'supplement',
+  MENU = 'menu',
   OTHER = 'other',
 }
 
@@ -370,15 +371,8 @@ export class ItemModel
   declare allergenNotes?: string;
 
   // =========================================================================
-  // Taste & Preparation
+  // Preparation Information
   // =========================================================================
-
-  @Column({
-    type: DataType.ENUM(...Object.values(SpicyLevel)),
-    allowNull: false,
-    defaultValue: SpicyLevel.NONE,
-  })
-  declare spicyLevel: SpicyLevel;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -390,7 +384,7 @@ export class ItemModel
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: true,
+    defaultValue: false,
   })
   declare isCooked: boolean;
 
@@ -415,8 +409,33 @@ export class ItemModel
   })
   declare isSteamed: boolean;
 
+  @Column({
+    type: DataType.ENUM(...Object.values(SpicyLevel)),
+    allowNull: false,
+    defaultValue: SpicyLevel.NONE,
+  })
+  declare spicyLevel: SpicyLevel;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+    validate: {
+      min: {
+        args: [0],
+        msg: 'Preparation time must be a positive number',
+      },
+    },
+  })
+  declare preparationTime?: number;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare preparationNotes?: string;
+
   // =========================================================================
-  // Nutritional Information (per serving)
+  // Serving Information
   // =========================================================================
 
   @Column({
@@ -426,7 +445,29 @@ export class ItemModel
   declare servingSize?: string;
 
   @Column({
-    type: DataType.DECIMAL(8, 2),
+    type: DataType.INTEGER,
+    allowNull: true,
+    validate: {
+      min: {
+        args: [1],
+        msg: 'Servings per portion must be at least 1',
+      },
+    },
+  })
+  declare servingsPerPortion?: number;
+
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+  })
+  declare servingTemperature?: string;
+
+  // =========================================================================
+  // Nutritional Information
+  // =========================================================================
+
+  @Column({
+    type: DataType.INTEGER,
     allowNull: true,
     validate: {
       min: {
@@ -542,45 +583,57 @@ export class ItemModel
   })
   declare availableForDineIn: boolean;
 
+  @Index('idx_items_featured')
   @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-    validate: {
-      min: {
-        args: [0],
-        msg: 'Stock quantity must be a positive number',
-      },
-    },
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   })
-  declare stockQuantity?: number;
+  declare featured: boolean;
 
   @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-    validate: {
-      min: {
-        args: [0],
-        msg: 'Low stock threshold must be a positive number',
-      },
-    },
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   })
-  declare lowStockThreshold?: number;
+  declare isNewItem: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isPopular: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isSeasonal: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isLimitedTime: boolean;
+
+  @Column({
+    type: DataType.DATEONLY,
+    allowNull: true,
+  })
+  declare availableFrom?: Date;
+
+  @Column({
+    type: DataType.DATEONLY,
+    allowNull: true,
+  })
+  declare availableUntil?: Date;
 
   // =========================================================================
-  // Ordering
+  // Ordering Constraints
   // =========================================================================
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-    validate: {
-      min: {
-        args: [0],
-        msg: 'Preparation time must be a positive number',
-      },
-    },
-  })
-  declare preparationTime?: number;
 
   @Column({
     type: DataType.INTEGER,
@@ -608,11 +661,53 @@ export class ItemModel
   declare maxOrderQuantity?: number;
 
   // =========================================================================
-  // Display
+  // Stock Management
   // =========================================================================
 
   @Column({
-    type: DataType.STRING(500),
+    type: DataType.INTEGER,
+    allowNull: true,
+    validate: {
+      min: {
+        args: [0],
+        msg: 'Stock quantity must be a positive number',
+      },
+    },
+  })
+  declare stockQuantity?: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+    validate: {
+      min: {
+        args: [0],
+        msg: 'Low stock threshold must be a positive number',
+      },
+    },
+  })
+  declare lowStockThreshold?: number;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare trackStock: boolean;
+
+  // =========================================================================
+  // Display Options
+  // =========================================================================
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  declare sortOrder: number;
+
+  @Column({
+    type: DataType.STRING(255),
     allowNull: true,
     validate: {
       isUrl: {
@@ -623,7 +718,7 @@ export class ItemModel
   declare imageUrl?: string;
 
   @Column({
-    type: DataType.STRING(500),
+    type: DataType.STRING(255),
     allowNull: true,
     validate: {
       isUrl: {
@@ -634,22 +729,13 @@ export class ItemModel
   declare thumbnailUrl?: string;
 
   @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
+    type: DataType.JSON,
+    allowNull: true,
   })
-  declare displayOrder: number;
-
-  @Index('idx_items_featured')
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  declare featured: boolean;
+  declare additionalImages?: string[];
 
   // =========================================================================
-  // Metadata
+  // Identification
   // =========================================================================
 
   @Index('idx_items_sku')
@@ -671,12 +757,6 @@ export class ItemModel
     allowNull: true,
   })
   declare tags?: string[];
-
-  @Column({
-    type: DataType.JSON,
-    allowNull: true,
-  })
-  declare optionGroupIds?: string[];
 
   // =========================================================================
   // Timestamps

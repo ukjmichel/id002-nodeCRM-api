@@ -24,7 +24,7 @@ import { ItemModel } from '../models/item.model.js';
  *   where: { available: true, isVegan: true },
  *   limit: 10,
  *   offset: 0,
- *   order: [['displayOrder', 'ASC']]
+ *   order: [['sortOrder', 'ASC']]
  * });
  * ```
  */

@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { ItemOptionService } from '../services/index.js';
+import { ItemOptionService } from '../services/item-options/index.js';
 
 /**
  * Get all option groups containing a specific item

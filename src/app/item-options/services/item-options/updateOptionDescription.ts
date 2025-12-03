@@ -2,11 +2,14 @@
  * Update the description of an Option
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import {
+  NotFoundError,
+  ValidationError,
+} from '../../../../core/errors/index.js';
 
 /**
  * Update the description of an Option
@@ -52,14 +55,10 @@ export const updateOptionDescription = async (
     }
 
     // Find the Option
-    const optionOption = await ItemOptionsModel.findByOptionId(
-      optionId.trim()
-    );
+    const optionOption = await ItemOptionsModel.findByOptionId(optionId.trim());
 
     if (!optionOption) {
-      throw new NotFoundError(
-        `Option with optionId '${optionId}' not found`
-      );
+      throw new NotFoundError(`Option with optionId '${optionId}' not found`);
     }
 
     // Update description and save

@@ -2,12 +2,12 @@
  * Get all Options that contain any of the specified items
  */
 
-import { ItemOptionsModel } from '../models/item-option.model.js';
-import { IItemOptionsDocument } from '../interfaces/item-option.interface.js';
+import { ItemOptionsModel } from '../../models/item-option.model.js';
+import { IItemOptionsDocument } from '../../interfaces/item-option.interface.js';
 
 import { validateItemId } from './validateItemId.js';
-import { ApiResponse } from '../../../core/interfaces/index.js';
-import { ValidationError } from '../../../core/errors/index.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
+import { ValidationError } from '../../../../core/errors/index.js';
 
 /**
  * Get all Options that contain any of the specified items

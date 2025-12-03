@@ -4,7 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findHalalItems } from '../services/findHalalItems.js';
+import { findHalalItems } from '../services';
+
 
 /**
  * Get all halal items

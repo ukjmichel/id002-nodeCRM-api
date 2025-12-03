@@ -4,18 +4,7 @@
  */
 
 import { param } from 'express-validator';
-
-const VALID_ITEM_TYPES = [
-  'food',
-  'drink',
-  'dessert',
-  'appetizer',
-  'main_course',
-  'side_dish',
-  'snack',
-  'combo',
-  'other',
-];
+import { VALID_ITEM_TYPES } from './constants.js';
 
 export const itemTypeValidator = [
   param('type')

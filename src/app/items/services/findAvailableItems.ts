@@ -8,7 +8,6 @@ import { ApiResponse } from '../../../core/interfaces/index.js';
 import { ItemModel } from '../models/item.model.js';
 import { findAllItems } from './findAllItems.js';
 
-
 /**
  * Find all available business items
  *
@@ -35,7 +34,7 @@ export const findAvailableItems = async (
     const result = await findAllItems({
       where,
       order: [
-        ['displayOrder', 'ASC'],
+        ['sortOrder', 'ASC'],
         ['name', 'ASC'],
       ],
     });
