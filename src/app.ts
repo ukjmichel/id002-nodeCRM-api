@@ -26,7 +26,7 @@ import authRouter from './app/auth/routes/auth.route.js';
 import roleRouter from './app/authorisation/routes/role.routes.js';
 import businessRouter from './app/businesses/routes/business.routes.js';
 import ItemRouter from './app/items/routes/item.routes.js';
-import ItemOptionsRouter from './app/item-options/routes/item-option.routes.js';
+import ItemOptionsRouter from './app/item-options/routes/option-group.routes.js';
 
 export const app = express();
 

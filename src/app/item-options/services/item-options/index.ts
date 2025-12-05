@@ -1,306 +1,224 @@
 /**
  * =============================================================================
- * Business Item Option Service - Main Export
+ * Item Option Service - Main Export
  * =============================================================================
- * Combines all business item Option service methods into a single service object.
- * Each custom method is implemented in its own file for better maintainability.
+ * Service for managing relationships between Items (SQL) and OptionGroups (MongoDB).
+ * This junction table service handles the many-to-many relationship between
+ * Items (Sequelize) and OptionGroups (Mongoose).
  * =============================================================================
  */
 
-import { ItemOptionsModel } from '../../models/item-option.model.js';
 import {
-  IItemOptions,
-  IItemOptionsDocument,
-  IOptionItem,
+  ItemOptionAttributes,
+  ItemOptionCreationAttributes,
+  AddOptionToItemInput,
+  BulkAddOptionsToItemInput,
+  UpdateItemOptionInput,
+  ReplaceItemOptionsInput,
+  ItemOptionOperationResult,
 } from '../../interfaces/item-option.interface.js';
+import { ApiResponse } from '../../../../core/interfaces/index.js';
 
-// Import custom service methods
-import { findByOptionId } from './findByOptionId.js';
-import { findByItemId } from './findByItemId.js';
-import { getOptionsByItems } from './getOptionsByItems.js';
-
-import { addItemToOption } from './addItemToOption.js';
-import { addMultipleItemsToOption } from './addMultipleItemsToOption.js';
-import { removeItemFromOption } from './removeItemFromOption.js';
-import { removeMultipleItemsFromOption } from './removeMultipleItemsFromOption.js';
-import { clearAllItems } from './clearAllItems.js';
-import { replaceAllItems } from './replaceAllItems.js';
-
-import { hasItem } from './hasItem.js';
-import { getItemCount } from './getItemCount.js';
-import { getActiveItems } from './getActiveItems.js';
-import { getItemDetails } from './getItemDetails.js';
-
-import { updateOptionDescription } from './updateOptionDescription.js';
-import { updateItemMaxQuantity } from './updateItemMaxQuantity.js';
-import { setItemActiveStatus } from './setItemActiveStatus.js';
-import { bulkUpdateItems, BulkUpdateItemInput } from './bulkUpdateItems.js';
-import { activateAllItems } from './activateAllItems.js';
-import { deactivateAllItems } from './deactivateAllItems.js';
-
-import { validateItemId } from './validateItemId.js';
-
-import createMongooseCrudService, {
-  ApiResponse,
-  IMongooseCrudService,
-} from '../../../../core/utils/mongooseCrudServiceGenerator.js';
+// Import service methods
+import { addOptionToItem } from './addOptionToItem.js';
+import { bulkAddOptionsToItem } from './bulkAddOptionsToItem.js';
+import { removeOptionFromItem } from './removeOptionFromItem.js';
+import { removeAllOptionsFromItem } from './removeAllOptionsFromItem.js';
+import { findOptionsByItemId } from './findOptionsByItemId.js';
+import { findItemsByOptionId } from './findItemsByOptionId.js';
+import { findItemOption } from './findItemOption.js';
+import { updateItemOption } from './updateItemOption.js';
+import { replaceItemOptions } from './replaceItemOptions.js';
+import { hasOption } from './hasOption.js';
+import { getOptionCount } from './getOptionCount.js';
+import { getRequiredOptions } from './getRequiredOptions.js';
+import { setOptionRequired } from './setOptionRequired.js';
+import { updateSortOrder } from './updateSortOrder.js';
+import { reorderOptions } from './reorderOptions.js';
+import { ItemOptionModel } from '../../models/item-option.model.js';
 
 /**
- * Extended Business Item Option Service Interface
- * Includes standard CRUD operations plus custom business logic methods
+ * Item Option Service Interface
  */
-export interface IItemOptionService extends IMongooseCrudService<IItemOptions> {
-  // =========================================================================
+export interface IItemOptionService {
+  // Add/Create Methods
+  addOptionToItem(
+    input: AddOptionToItemInput
+  ): Promise<ApiResponse<ItemOptionModel>>;
+  bulkAddOptionsToItem(
+    input: BulkAddOptionsToItemInput
+  ): Promise<ApiResponse<ItemOptionModel[]>>;
+
+  // Remove Methods
+  removeOptionFromItem(
+    itemId: string,
+    optionId: string
+  ): Promise<ApiResponse<ItemOptionOperationResult>>;
+  removeAllOptionsFromItem(
+    itemId: string
+  ): Promise<ApiResponse<ItemOptionOperationResult>>;
+
   // Find Methods
-  // =========================================================================
-  findByOptionId(optionId: string): Promise<ApiResponse<IItemOptionsDocument>>;
-  findByItemId(itemId: string): Promise<ApiResponse<IItemOptionsDocument[]>>;
-  getOptionsByItems(
-    itemIds: string[]
-  ): Promise<ApiResponse<IItemOptionsDocument[]>>;
-
-  // =========================================================================
-  // Item Management Methods
-  // =========================================================================
-  addItemToOption(
-    optionId: string,
+  findOptionsByItemId(itemId: string): Promise<ApiResponse<ItemOptionModel[]>>;
+  findItemsByOptionId(
+    optionId: string
+  ): Promise<ApiResponse<ItemOptionModel[]>>;
+  findItemOption(
     itemId: string,
-    maxQuantity?: number,
-    active?: boolean
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  addMultipleItemsToOption(
-    optionId: string,
-    itemIds: string[],
-    defaultMaxQuantity?: number,
-    defaultActive?: boolean
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  removeItemFromOption(
-    optionId: string,
-    itemId: string
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  removeMultipleItemsFromOption(
-    optionId: string,
-    itemIds: string[]
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  clearAllItems(optionId: string): Promise<ApiResponse<IItemOptionsDocument>>;
-  replaceAllItems(
-    optionId: string,
-    itemIds: string[],
-    defaultMaxQuantity?: number,
-    defaultActive?: boolean
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
+    optionId: string
+  ): Promise<ApiResponse<ItemOptionModel>>;
 
-  // =========================================================================
-  // Query Methods
-  // =========================================================================
-  hasItem(optionId: string, itemId: string): Promise<ApiResponse<boolean>>;
-  getItemCount(optionId: string): Promise<ApiResponse<number>>;
-  getActiveItems(optionId: string): Promise<ApiResponse<IOptionItem[]>>;
-  getItemDetails(
-    optionId: string,
-    itemId: string
-  ): Promise<ApiResponse<IOptionItem>>;
-
-  // =========================================================================
   // Update Methods
-  // =========================================================================
-  updateOptionDescription(
-    optionId: string,
-    description: string
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  updateItemMaxQuantity(
-    optionId: string,
+  updateItemOption(
     itemId: string,
-    maxQuantity: number
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  setItemActiveStatus(
     optionId: string,
+    input: UpdateItemOptionInput
+  ): Promise<ApiResponse<ItemOptionModel>>;
+  replaceItemOptions(
+    input: ReplaceItemOptionsInput
+  ): Promise<ApiResponse<ItemOptionModel[]>>;
+  setOptionRequired(
     itemId: string,
-    active: boolean
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  bulkUpdateItems(
     optionId: string,
-    updates: BulkUpdateItemInput[]
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  activateAllItems(
-    optionId: string
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
-  deactivateAllItems(
-    optionId: string
-  ): Promise<ApiResponse<IItemOptionsDocument>>;
+    isRequired: boolean
+  ): Promise<ApiResponse<ItemOptionModel>>;
+  updateSortOrder(
+    itemId: string,
+    optionId: string,
+    sortOrder: number
+  ): Promise<ApiResponse<ItemOptionModel>>;
+  reorderOptions(
+    itemId: string,
+    optionIds: string[]
+  ): Promise<ApiResponse<ItemOptionModel[]>>;
 
-  // =========================================================================
-  // Validation Methods
-  // =========================================================================
-  validateItemId(itemId: string): boolean;
+  // Query Methods
+  hasOption(itemId: string, optionId: string): Promise<ApiResponse<boolean>>;
+  getOptionCount(itemId: string): Promise<ApiResponse<number>>;
+  getRequiredOptions(itemId: string): Promise<ApiResponse<ItemOptionModel[]>>;
 }
 
 /**
- * Create base CRUD service using the generic generator
- * Use 'as any' to bypass type checking for the model with custom static methods
- */
-const baseCrudService = createMongooseCrudService<IItemOptions>(
-  ItemOptionsModel as any,
-  'ItemOption'
-);
-
-/**
- * Business Item Option Service
- * Provides all CRUD operations and Option-specific business logic
+ * Item Option Service
+ * Manages relationships between Items (SQL) and OptionGroups (MongoDB)
  *
  * @example
  * ```typescript
  * import { ItemOptionService } from './services/item-option';
  *
- * // Create a new Option
- * const newOption = await ItemOptionService.create({
- *   optionId: 'size-options-001',
- *   description: 'Size options for beverages',
- *   items: []
+ * // Add an option to an item
+ * const result = await ItemOptionService.addOptionToItem({
+ *   itemId: '550e8400-e29b-41d4-a716-446655440001',
+ *   optionId: '507f1f77bcf86cd799439011',
+ *   sortOrder: 1,
+ *   isRequired: true
  * });
  *
- * // Add items to the Option with custom settings
- * await ItemOptionService.addMultipleItemsToOption(
- *   'size-options-001',
- *   [
- *     '550e8400-e29b-41d4-a716-446655440001',
- *     '550e8400-e29b-41d4-a716-446655440002'
- *   ],
- *   5,    // maxQuantity
- *   true  // active
- * );
+ * // Bulk add options to an item
+ * await ItemOptionService.bulkAddOptionsToItem({
+ *   itemId: '550e8400-e29b-41d4-a716-446655440001',
+ *   options: [
+ *     { optionId: '507f1f77bcf86cd799439011', sortOrder: 1, isRequired: true },
+ *     { optionId: '507f1f77bcf86cd799439012', sortOrder: 2, isRequired: false }
+ *   ]
+ * });
  *
- * // Find all Options for a specific item
- * const options = await ItemOptionService.findByItemId(
+ * // Find all options for an item
+ * const options = await ItemOptionService.findOptionsByItemId(
  *   '550e8400-e29b-41d4-a716-446655440001'
  * );
  *
- * // Check if an Option contains an item
- * const hasItem = await ItemOptionService.hasItem(
- *   'size-options-001',
- *   '550e8400-e29b-41d4-a716-446655440001'
- * );
- *
- * // Update Option description
- * await ItemOptionService.updateOptionDescription(
- *   'size-options-001',
- *   'Updated size options for all beverages'
- * );
- *
- * // Update item max quantity
- * await ItemOptionService.updateItemMaxQuantity(
- *   'size-options-001',
+ * // Check if item has an option
+ * const hasOpt = await ItemOptionService.hasOption(
  *   '550e8400-e29b-41d4-a716-446655440001',
- *   10
+ *   '507f1f77bcf86cd799439011'
  * );
  *
- * // Bulk update multiple items
- * await ItemOptionService.bulkUpdateItems('size-options-001', [
- *   { itemId: '550e8400-e29b-41d4-a716-446655440001', maxQuantity: 5 },
- *   { itemId: '550e8400-e29b-41d4-a716-446655440002', active: false },
- * ]);
+ * // Get required options
+ * const required = await ItemOptionService.getRequiredOptions(
+ *   '550e8400-e29b-41d4-a716-446655440001'
+ * );
  *
- * // Get all active items
- * const activeItems = await ItemOptionService.getActiveItems('size-options-001');
+ * // Reorder options
+ * await ItemOptionService.reorderOptions(
+ *   '550e8400-e29b-41d4-a716-446655440001',
+ *   ['507f1f77bcf86cd799439012', '507f1f77bcf86cd799439011']
+ * );
+ *
+ * // Remove option from item
+ * await ItemOptionService.removeOptionFromItem(
+ *   '550e8400-e29b-41d4-a716-446655440001',
+ *   '507f1f77bcf86cd799439011'
+ * );
  * ```
  */
 export const ItemOptionService: IItemOptionService = {
-  // =========================================================================
-  // Standard CRUD Operations (from base service)
-  // =========================================================================
-  create: baseCrudService.create,
-  findAll: baseCrudService.findAll,
-  findById: baseCrudService.findById,
-  findOne: baseCrudService.findOne,
-  update: baseCrudService.update,
-  delete: baseCrudService.delete,
-  bulkCreate: baseCrudService.bulkCreate,
-  count: baseCrudService.count,
+  // Add/Create Methods
+  addOptionToItem,
+  bulkAddOptionsToItem,
 
-  // =========================================================================
+  // Remove Methods
+  removeOptionFromItem,
+  removeAllOptionsFromItem,
+
   // Find Methods
-  // =========================================================================
-  findByOptionId,
-  findByItemId,
-  getOptionsByItems,
+  findOptionsByItemId,
+  findItemsByOptionId,
+  findItemOption,
 
-  // =========================================================================
-  // Item Management Methods
-  // =========================================================================
-  addItemToOption,
-  addMultipleItemsToOption,
-  removeItemFromOption,
-  removeMultipleItemsFromOption,
-  clearAllItems,
-  replaceAllItems,
-
-  // =========================================================================
-  // Query Methods
-  // =========================================================================
-  hasItem,
-  getItemCount,
-  getActiveItems,
-  getItemDetails,
-
-  // =========================================================================
   // Update Methods
-  // =========================================================================
-  updateOptionDescription,
-  updateItemMaxQuantity,
-  setItemActiveStatus,
-  bulkUpdateItems,
-  activateAllItems,
-  deactivateAllItems,
+  updateItemOption,
+  replaceItemOptions,
+  setOptionRequired,
+  updateSortOrder,
+  reorderOptions,
 
-  // =========================================================================
-  // Validation Methods
-  // =========================================================================
-  validateItemId,
+  // Query Methods
+  hasOption,
+  getOptionCount,
+  getRequiredOptions,
 };
 
 export default ItemOptionService;
 
-// =========================================================================
+// =============================================================================
 // Re-export Individual Methods for Direct Imports
-// =========================================================================
+// =============================================================================
 
 export {
-  // Find methods
-  findByOptionId,
-  findByItemId,
-  getOptionsByItems,
+  // Add/Create Methods
+  addOptionToItem,
+  bulkAddOptionsToItem,
 
-  // Item management
-  addItemToOption,
-  addMultipleItemsToOption,
-  removeItemFromOption,
-  removeMultipleItemsFromOption,
-  clearAllItems,
-  replaceAllItems,
+  // Remove Methods
+  removeOptionFromItem,
+  removeAllOptionsFromItem,
 
-  // Query methods
-  hasItem,
-  getItemCount,
-  getActiveItems,
-  getItemDetails,
+  // Find Methods
+  findOptionsByItemId,
+  findItemsByOptionId,
+  findItemOption,
 
-  // Update methods
-  updateOptionDescription,
-  updateItemMaxQuantity,
-  setItemActiveStatus,
-  bulkUpdateItems,
-  activateAllItems,
-  deactivateAllItems,
+  // Update Methods
+  updateItemOption,
+  replaceItemOptions,
+  setOptionRequired,
+  updateSortOrder,
+  reorderOptions,
 
-  // Validation methods
-  validateItemId,
+  // Query Methods
+  hasOption,
+  getOptionCount,
+  getRequiredOptions,
 };
 
 // Re-export types and interfaces
 export type {
-  IItemOptions,
-  IItemOptionsDocument,
-  IOptionItem,
+  ItemOptionAttributes,
+  ItemOptionCreationAttributes,
+  AddOptionToItemInput,
+  BulkAddOptionsToItemInput,
+  UpdateItemOptionInput,
+  ReplaceItemOptionsInput,
+  ItemOptionOperationResult,
 } from '../../interfaces/item-option.interface.js';
-
-export type { BulkUpdateItemInput } from './bulkUpdateItems.js';
