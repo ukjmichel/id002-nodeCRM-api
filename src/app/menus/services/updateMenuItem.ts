@@ -1,13 +1,13 @@
 /**
- * Add Item To Menu Service
- * Adds a single item to a menu
+ * Update Menu Item Service
+ * Updates an item's configuration within a menu
  */
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-import { validateUuid } from '../../../core/utils/uuidValidator.js';
+import { validateUuid } from '../../../core/utils/index.js';
 import { MenuModel } from '../models/menu.model.js';
-import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js';
+import { IMenuDocument, UpdateMenuItemInput } from '../interfaces/menu.interface.js';
 
 /**
  * MongoDB ObjectId validation regex
@@ -15,26 +15,28 @@ import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
 
 /**
- * Add an item to a menu
+ * Update an item's configuration within a menu
  *
  * @param id - Menu MongoDB _id
- * @param input - Item data to add
+ * @param itemId - Item UUID to update
+ * @param input - Update data
  * @returns Updated menu record
- * @throws {NotFoundError} When menu is not found
+ * @throws {NotFoundError} When menu or item is not found
  * @throws {ValidationError} When validation fails
  *
  * @example
  * ```typescript
- * const updatedMenu = await addItemToMenu('507f1f77bcf86cd799439011', {
- *   itemId: '550e8400-e29b-41d4-a716-446655440000',
- *   quantity: 2,
- *   allowOptions: true
- * });
+ * const updatedMenu = await updateMenuItem(
+ *   '507f1f77bcf86cd799439011',
+ *   '550e8400-e29b-41d4-a716-446655440000',
+ *   { quantity: 5, allowOptions: false }
+ * );
  * ```
  */
-export const addItemToMenu = async (
+export const updateMenuItem = async (
   id: string,
-  input: AddMenuItemInput
+  itemId: string,
+  input: UpdateMenuItemInput
 ): Promise<ApiResponse<IMenuDocument>> => {
   try {
     // ========================================================================
@@ -52,11 +54,29 @@ export const addItemToMenu = async (
       );
     }
 
-    if (!input.itemId) {
+    if (!itemId) {
       throw new ValidationError('Validation failed', 'Item ID is required');
     }
 
-    validateUuid(input.itemId, 'Item ID');
+    validateUuid(itemId, 'Item ID');
+
+    // Validate at least one field is provided
+    if (input.quantity === undefined && input.allowOptions === undefined) {
+      throw new ValidationError(
+        'Validation failed',
+        'At least quantity or allowOptions must be provided'
+      );
+    }
+
+    // Validate quantity if provided
+    if (input.quantity !== undefined) {
+      if (!Number.isInteger(input.quantity) || input.quantity < 1 || input.quantity > 1000) {
+        throw new ValidationError(
+          'Validation failed',
+          'Quantity must be an integer between 1 and 1000'
+        );
+      }
+    }
 
     // ========================================================================
     // STEP 2: FIND MENU
@@ -69,45 +89,41 @@ export const addItemToMenu = async (
     }
 
     // ========================================================================
-    // STEP 3: CHECK IF ITEM ALREADY EXISTS
+    // STEP 3: FIND ITEM
     // ========================================================================
 
-    if (menu.hasItem(input.itemId)) {
-      throw new ValidationError(
-        'Duplicate item',
-        `Item ${input.itemId} already exists in this menu`
-      );
+    const item = menu.getItem(itemId);
+
+    if (!item) {
+      throw new NotFoundError(`Item ${itemId} not found in this menu`);
     }
 
     // ========================================================================
-    // STEP 4: ADD ITEM
+    // STEP 4: UPDATE ITEM
     // ========================================================================
 
-    menu.addItem(
-      input.itemId,
-      input.quantity ?? 1,
-      input.allowOptions ?? true
-    );
+    if (input.quantity !== undefined) {
+      menu.updateItemQuantity(itemId, input.quantity);
+    }
 
-    // Pre-save hook will validate itemId exists
+    if (input.allowOptions !== undefined) {
+      menu.setItemAllowOptions(itemId, input.allowOptions);
+    }
+
     await menu.save();
 
     return {
       success: true,
       data: menu,
-      message: 'Item added to menu successfully',
+      message: 'Menu item updated successfully',
     };
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
       throw error;
     }
 
-    if (error instanceof Error && error.name === 'ValidationError') {
-      throw new ValidationError('Validation failed', error.message);
-    }
-
     throw new ValidationError(
-      'Error adding item to Menu',
+      'Error updating Menu item',
       error instanceof Error ? error.message : String(error)
     );
   }

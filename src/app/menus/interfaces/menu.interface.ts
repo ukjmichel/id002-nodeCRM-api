@@ -3,21 +3,22 @@
  * =============================================================================
  * Menu Interface
  * =============================================================================
- * TypeScript interface for business menus containing items with their
- * quantities, active options, and default item selections.
+ * TypeScript interfaces for business menus
  * =============================================================================
  */
 
 import { Document, Model } from 'mongoose';
 
 /**
- * Interface for individual menu item with configuration
+ * Interface for individual menu item
  */
 export interface IMenuItem {
+  /** UUID reference to Item in SQL database */
   itemId: string;
+  /** Quantity of item (1-1000) */
   quantity: number;
-  activeOptions: string[];
-  defaultItems: string[];
+  /** Whether options are allowed for this item in this menu */
+  allowOptions: boolean;
 }
 
 /**
@@ -36,30 +37,19 @@ export interface IMenu {
  * Interface with document methods
  */
 export interface IMenuDocument extends IMenu, Document {
-  // Instance methods - Item management
-  addItem(
-    itemId: string,
-    quantity?: number,
-    activeOptions?: string[],
-    defaultItems?: string[]
-  ): void;
+  // Item management methods
+  addItem(itemId: string, quantity?: number, allowOptions?: boolean): void;
   removeItem(itemId: string): void;
   hasItem(itemId: string): boolean;
   getItem(itemId: string): IMenuItem | undefined;
   updateItemQuantity(itemId: string, quantity: number): boolean;
+  setItemAllowOptions(itemId: string, allowOptions: boolean): boolean;
+  isOptionsAllowed(itemId: string): boolean;
   getItemCount(): number;
-
-  // Instance methods - Active Options management
-  addActiveOption(itemId: string, optionId: string): boolean;
-  removeActiveOption(itemId: string, optionId: string): boolean;
-  hasActiveOption(itemId: string, optionId: string): boolean;
-  getActiveOptions(itemId: string): string[];
-
-  // Instance methods - Default Items management
-  addDefaultItem(itemId: string, defaultItemId: string): boolean;
-  removeDefaultItem(itemId: string, defaultItemId: string): boolean;
-  hasDefaultItem(itemId: string, defaultItemId: string): boolean;
-  getDefaultItems(itemId: string): string[];
+  getItemsWithOptions(): IMenuItem[];
+  getItemsWithoutOptions(): IMenuItem[];
+  getItemIds(): string[];
+  getTotalQuantity(): number;
 }
 
 /**
@@ -69,4 +59,48 @@ export interface IMenuModel extends Model<IMenuDocument> {
   findByMenuId(menuId: string): Promise<IMenuDocument | null>;
   findByItemId(itemId: string): Promise<IMenuDocument[]>;
   findByName(name: string): Promise<IMenuDocument[]>;
+  findByItemIdWithOptions(itemId: string): Promise<IMenuDocument[]>;
+}
+
+/**
+ * Input for creating a new menu
+ */
+export interface CreateMenuInput {
+  menuId: string;
+  name: string;
+  description: string;
+  items?: IMenuItem[];
+}
+
+/**
+ * Input for updating a menu
+ */
+export interface UpdateMenuInput {
+  name?: string;
+  description?: string;
+  items?: IMenuItem[];
+}
+
+/**
+ * Input for adding an item to a menu
+ */
+export interface AddMenuItemInput {
+  itemId: string;
+  quantity?: number;
+  allowOptions?: boolean;
+}
+
+/**
+ * Input for bulk adding items to a menu
+ */
+export interface BulkAddMenuItemsInput {
+  items: AddMenuItemInput[];
+}
+
+/**
+ * Input for updating a menu item
+ */
+export interface UpdateMenuItemInput {
+  quantity?: number;
+  allowOptions?: boolean;
 }

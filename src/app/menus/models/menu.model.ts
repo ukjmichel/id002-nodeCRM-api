@@ -4,7 +4,7 @@
  * MenuModel – Mongoose
  * =============================================================================
  * Stores information about business menus containing items with their
- * quantities, active options, and default item selections.
+ * quantities and option allowance settings.
  * =============================================================================
  */
 
@@ -42,23 +42,10 @@ const MenuItemSchema = new Schema<IMenuItem>(
       max: [1000, 'Quantity cannot exceed 1000'],
       default: 1,
     },
-    activeOptions: {
-      type: [String],
-      default: [],
-    },
-    defaultItems: {
-      type: [String],
-      default: [],
-      validate: {
-        validator: function (v: string[]): boolean {
-          return v.every((id) => {
-            const uuidRegex =
-              /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            return uuidRegex.test(id);
-          });
-        },
-        message: 'All default items must be valid UUIDs',
-      },
+    allowOptions: {
+      type: Boolean,
+      required: true,
+      default: true,
     },
   },
   {
@@ -122,38 +109,70 @@ MenuSchema.index({ 'items.itemId': 1 });
 // Middleware/Hooks
 // =========================================================================
 
-MenuSchema.pre('save', function (next) {
-  if (this.isModified('menuId')) {
-    this.menuId = this.menuId.trim();
-  }
+MenuSchema.pre('save', async function (next) {
+  try {
+    // Trim string fields
+    if (this.isModified('menuId')) {
+      this.menuId = this.menuId.trim();
+    }
 
-  if (this.isModified('name')) {
-    this.name = this.name.trim();
-  }
+    if (this.isModified('name')) {
+      this.name = this.name.trim();
+    }
 
-  if (this.isModified('description')) {
-    this.description = this.description.trim();
-  }
+    if (this.isModified('description')) {
+      this.description = this.description.trim();
+    }
 
-  // Remove duplicate itemIds from items array
-  if (this.isModified('items')) {
-    const seen = new Set<string>();
-    this.items = this.items.filter((item) => {
-      if (seen.has(item.itemId)) {
-        return false;
+    // Process items array
+    if (this.isModified('items') && this.items.length > 0) {
+      // Remove duplicate itemIds from items array (keep first occurrence)
+      const seen = new Set<string>();
+      this.items = this.items.filter((item) => {
+        if (seen.has(item.itemId)) {
+          return false;
+        }
+        seen.add(item.itemId);
+        return true;
+      });
+
+      // Validate that all itemIds exist in the Items database (SQL)
+      // Import service and error dynamically to avoid circular dependency
+      const { findItemById } = await import(
+        '../../items/services/findItemById.js'
+      );
+      const { ValidationError } = await import('../../../core/errors/ValidationError.js');
+
+      const nonExistentItemIds: string[] = [];
+
+      // Check each itemId exists
+      for (const item of this.items) {
+        try {
+          await findItemById(item.itemId);
+        } catch (error) {
+          // If NotFoundError, item doesn't exist
+          if (error instanceof Error && error.name === 'NotFoundError') {
+            nonExistentItemIds.push(item.itemId);
+          } else {
+            throw error;
+          }
+        }
       }
-      seen.add(item.itemId);
-      return true;
-    });
 
-    // Remove duplicates within activeOptions and defaultItems
-    this.items.forEach((item) => {
-      item.activeOptions = [...new Set(item.activeOptions)];
-      item.defaultItems = [...new Set(item.defaultItems)];
-    });
+      if (nonExistentItemIds.length > 0) {
+        throw new ValidationError(
+          'Invalid item IDs in menu',
+          `The following item IDs do not exist: ${nonExistentItemIds.join(
+            ', '
+          )}`
+        );
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error as Error);
   }
-
-  next();
 });
 
 // =========================================================================
@@ -171,15 +190,14 @@ MenuSchema.methods.toJSON = function () {
 MenuSchema.methods.addItem = function (
   itemId: string,
   quantity: number = 1,
-  activeOptions: string[] = [],
-  defaultItems: string[] = []
+  allowOptions: boolean = true
 ): void {
   const existingIndex = this.items.findIndex(
     (item: IMenuItem) => item.itemId === itemId
   );
 
   if (existingIndex === -1) {
-    this.items.push({ itemId, quantity, activeOptions, defaultItems });
+    this.items.push({ itemId, quantity, allowOptions });
   }
 };
 
@@ -220,128 +238,65 @@ MenuSchema.methods.updateItemQuantity = function (
 };
 
 /**
+ * Set an item's allowOptions status
+ */
+MenuSchema.methods.setItemAllowOptions = function (
+  itemId: string,
+  allowOptions: boolean
+): boolean {
+  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
+  if (item) {
+    item.allowOptions = allowOptions;
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Check if options are allowed for an item
+ */
+MenuSchema.methods.isOptionsAllowed = function (itemId: string): boolean {
+  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
+  if (!item) return false;
+  return item.allowOptions;
+};
+
+/**
  * Get the number of items in this menu
  */
 MenuSchema.methods.getItemCount = function (): number {
   return this.items.length;
 };
 
-// =========================================================================
-// Active Options Methods
-// =========================================================================
-
 /**
- * Add an active option to an item
+ * Get all items that allow options
  */
-MenuSchema.methods.addActiveOption = function (
-  itemId: string,
-  optionId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
-
-  if (!item.activeOptions.includes(optionId)) {
-    item.activeOptions.push(optionId);
-    return true;
-  }
-  return false;
+MenuSchema.methods.getItemsWithOptions = function (): IMenuItem[] {
+  return this.items.filter((item: IMenuItem) => item.allowOptions);
 };
 
 /**
- * Remove an active option from an item
+ * Get all items that don't allow options
  */
-MenuSchema.methods.removeActiveOption = function (
-  itemId: string,
-  optionId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
+MenuSchema.methods.getItemsWithoutOptions = function (): IMenuItem[] {
+  return this.items.filter((item: IMenuItem) => !item.allowOptions);
+};
 
-  const initialLength = item.activeOptions.length;
-  item.activeOptions = item.activeOptions.filter(
-    (id: string) => id !== optionId
+/**
+ * Get all item IDs in this menu
+ */
+MenuSchema.methods.getItemIds = function (): string[] {
+  return this.items.map((item: IMenuItem) => item.itemId);
+};
+
+/**
+ * Get total quantity of all items
+ */
+MenuSchema.methods.getTotalQuantity = function (): number {
+  return this.items.reduce(
+    (total: number, item: IMenuItem) => total + item.quantity,
+    0
   );
-  return item.activeOptions.length < initialLength;
-};
-
-/**
- * Check if an option is active for an item
- */
-MenuSchema.methods.hasActiveOption = function (
-  itemId: string,
-  optionId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
-  return item.activeOptions.includes(optionId);
-};
-
-/**
- * Get all active options for an item
- */
-MenuSchema.methods.getActiveOptions = function (itemId: string): string[] {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return [];
-  return item.activeOptions;
-};
-
-// =========================================================================
-// Default Items Methods
-// =========================================================================
-
-/**
- * Add a default item to an item
- */
-MenuSchema.methods.addDefaultItem = function (
-  itemId: string,
-  defaultItemId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
-
-  if (!item.defaultItems.includes(defaultItemId)) {
-    item.defaultItems.push(defaultItemId);
-    return true;
-  }
-  return false;
-};
-
-/**
- * Remove a default item from an item
- */
-MenuSchema.methods.removeDefaultItem = function (
-  itemId: string,
-  defaultItemId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
-
-  const initialLength = item.defaultItems.length;
-  item.defaultItems = item.defaultItems.filter(
-    (id: string) => id !== defaultItemId
-  );
-  return item.defaultItems.length < initialLength;
-};
-
-/**
- * Check if an item has a specific default item
- */
-MenuSchema.methods.hasDefaultItem = function (
-  itemId: string,
-  defaultItemId: string
-): boolean {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return false;
-  return item.defaultItems.includes(defaultItemId);
-};
-
-/**
- * Get all default items for an item
- */
-MenuSchema.methods.getDefaultItems = function (itemId: string): string[] {
-  const item = this.items.find((item: IMenuItem) => item.itemId === itemId);
-  if (!item) return [];
-  return item.defaultItems;
 };
 
 // =========================================================================
@@ -367,6 +322,20 @@ MenuSchema.statics.findByItemId = function (itemId: string) {
  */
 MenuSchema.statics.findByName = function (name: string) {
   return this.find({ name: { $regex: name, $options: 'i' } });
+};
+
+/**
+ * Find menus where a specific item allows options
+ */
+MenuSchema.statics.findByItemIdWithOptions = function (itemId: string) {
+  return this.find({
+    items: {
+      $elemMatch: {
+        itemId: itemId,
+        allowOptions: true,
+      },
+    },
+  });
 };
 
 // =========================================================================

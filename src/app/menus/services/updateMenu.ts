@@ -1,13 +1,12 @@
 /**
- * Add Item To Menu Service
- * Adds a single item to a menu
+ * Update Menu Service
+ * Updates an existing menu record
  */
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-import { validateUuid } from '../../../core/utils/uuidValidator.js';
 import { MenuModel } from '../models/menu.model.js';
-import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js';
+import { IMenuDocument, UpdateMenuInput } from '../interfaces/menu.interface.js';
 
 /**
  * MongoDB ObjectId validation regex
@@ -15,30 +14,29 @@ import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
 
 /**
- * Add an item to a menu
+ * Update a menu by MongoDB _id
  *
  * @param id - Menu MongoDB _id
- * @param input - Item data to add
+ * @param data - Data to update
  * @returns Updated menu record
  * @throws {NotFoundError} When menu is not found
  * @throws {ValidationError} When validation fails
  *
  * @example
  * ```typescript
- * const updatedMenu = await addItemToMenu('507f1f77bcf86cd799439011', {
- *   itemId: '550e8400-e29b-41d4-a716-446655440000',
- *   quantity: 2,
- *   allowOptions: true
+ * const updatedMenu = await updateMenu('507f1f77bcf86cd799439011', {
+ *   name: 'Updated Lunch Menu',
+ *   description: 'New description'
  * });
  * ```
  */
-export const addItemToMenu = async (
+export const updateMenu = async (
   id: string,
-  input: AddMenuItemInput
+  data: UpdateMenuInput
 ): Promise<ApiResponse<IMenuDocument>> => {
   try {
     // ========================================================================
-    // STEP 1: VALIDATE INPUTS
+    // STEP 1: VALIDATE ID
     // ========================================================================
 
     if (!id) {
@@ -52,14 +50,8 @@ export const addItemToMenu = async (
       );
     }
 
-    if (!input.itemId) {
-      throw new ValidationError('Validation failed', 'Item ID is required');
-    }
-
-    validateUuid(input.itemId, 'Item ID');
-
     // ========================================================================
-    // STEP 2: FIND MENU
+    // STEP 2: FIND EXISTING MENU
     // ========================================================================
 
     const menu = await MenuModel.findById(id);
@@ -69,33 +61,28 @@ export const addItemToMenu = async (
     }
 
     // ========================================================================
-    // STEP 3: CHECK IF ITEM ALREADY EXISTS
+    // STEP 3: UPDATE FIELDS
     // ========================================================================
 
-    if (menu.hasItem(input.itemId)) {
-      throw new ValidationError(
-        'Duplicate item',
-        `Item ${input.itemId} already exists in this menu`
-      );
+    if (data.name !== undefined) {
+      menu.name = data.name;
     }
 
-    // ========================================================================
-    // STEP 4: ADD ITEM
-    // ========================================================================
+    if (data.description !== undefined) {
+      menu.description = data.description;
+    }
 
-    menu.addItem(
-      input.itemId,
-      input.quantity ?? 1,
-      input.allowOptions ?? true
-    );
+    if (data.items !== undefined) {
+      menu.items = data.items;
+    }
 
-    // Pre-save hook will validate itemId exists
+    // Pre-save hook will validate itemIds exist
     await menu.save();
 
     return {
       success: true,
       data: menu,
-      message: 'Item added to menu successfully',
+      message: 'Menu updated successfully',
     };
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
@@ -107,7 +94,7 @@ export const addItemToMenu = async (
     }
 
     throw new ValidationError(
-      'Error adding item to Menu',
+      'Error updating Menu',
       error instanceof Error ? error.message : String(error)
     );
   }

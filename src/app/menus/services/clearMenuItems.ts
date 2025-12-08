@@ -1,13 +1,12 @@
 /**
- * Add Item To Menu Service
- * Adds a single item to a menu
+ * Clear Menu Items Service
+ * Removes all items from a menu
  */
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-import { validateUuid } from '../../../core/utils/uuidValidator.js';
 import { MenuModel } from '../models/menu.model.js';
-import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js';
+import { IMenuDocument } from '../interfaces/menu.interface.js';
 
 /**
  * MongoDB ObjectId validation regex
@@ -15,30 +14,25 @@ import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
 
 /**
- * Add an item to a menu
+ * Remove all items from a menu
  *
  * @param id - Menu MongoDB _id
- * @param input - Item data to add
  * @returns Updated menu record
  * @throws {NotFoundError} When menu is not found
  * @throws {ValidationError} When validation fails
  *
  * @example
  * ```typescript
- * const updatedMenu = await addItemToMenu('507f1f77bcf86cd799439011', {
- *   itemId: '550e8400-e29b-41d4-a716-446655440000',
- *   quantity: 2,
- *   allowOptions: true
- * });
+ * const updatedMenu = await clearMenuItems('507f1f77bcf86cd799439011');
+ * console.log(updatedMenu.data.items.length); // 0
  * ```
  */
-export const addItemToMenu = async (
-  id: string,
-  input: AddMenuItemInput
+export const clearMenuItems = async (
+  id: string
 ): Promise<ApiResponse<IMenuDocument>> => {
   try {
     // ========================================================================
-    // STEP 1: VALIDATE INPUTS
+    // STEP 1: VALIDATE INPUT
     // ========================================================================
 
     if (!id) {
@@ -52,12 +46,6 @@ export const addItemToMenu = async (
       );
     }
 
-    if (!input.itemId) {
-      throw new ValidationError('Validation failed', 'Item ID is required');
-    }
-
-    validateUuid(input.itemId, 'Item ID');
-
     // ========================================================================
     // STEP 2: FIND MENU
     // ========================================================================
@@ -69,45 +57,25 @@ export const addItemToMenu = async (
     }
 
     // ========================================================================
-    // STEP 3: CHECK IF ITEM ALREADY EXISTS
+    // STEP 3: CLEAR ITEMS
     // ========================================================================
 
-    if (menu.hasItem(input.itemId)) {
-      throw new ValidationError(
-        'Duplicate item',
-        `Item ${input.itemId} already exists in this menu`
-      );
-    }
-
-    // ========================================================================
-    // STEP 4: ADD ITEM
-    // ========================================================================
-
-    menu.addItem(
-      input.itemId,
-      input.quantity ?? 1,
-      input.allowOptions ?? true
-    );
-
-    // Pre-save hook will validate itemId exists
+    const itemCount = menu.getItemCount();
+    menu.items = [];
     await menu.save();
 
     return {
       success: true,
       data: menu,
-      message: 'Item added to menu successfully',
+      message: `${itemCount} item(s) removed from menu`,
     };
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
       throw error;
     }
 
-    if (error instanceof Error && error.name === 'ValidationError') {
-      throw new ValidationError('Validation failed', error.message);
-    }
-
     throw new ValidationError(
-      'Error adding item to Menu',
+      'Error clearing Menu items',
       error instanceof Error ? error.message : String(error)
     );
   }

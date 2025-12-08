@@ -1,13 +1,17 @@
 /**
- * Add Item To Menu Service
- * Adds a single item to a menu
+ * Replace Menu Items Service
+ * Replaces all items in a menu with a new set
  */
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
 import { validateUuid } from '../../../core/utils/uuidValidator.js';
 import { MenuModel } from '../models/menu.model.js';
-import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js';
+import {
+  IMenuDocument,
+  IMenuItem,
+  AddMenuItemInput,
+} from '../interfaces/menu.interface.js';
 
 /**
  * MongoDB ObjectId validation regex
@@ -15,26 +19,25 @@ import { IMenuDocument, AddMenuItemInput } from '../interfaces/menu.interface.js
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i;
 
 /**
- * Add an item to a menu
+ * Replace all items in a menu with a new set
  *
  * @param id - Menu MongoDB _id
- * @param input - Item data to add
+ * @param items - New items array
  * @returns Updated menu record
  * @throws {NotFoundError} When menu is not found
  * @throws {ValidationError} When validation fails
  *
  * @example
  * ```typescript
- * const updatedMenu = await addItemToMenu('507f1f77bcf86cd799439011', {
- *   itemId: '550e8400-e29b-41d4-a716-446655440000',
- *   quantity: 2,
- *   allowOptions: true
- * });
+ * const updatedMenu = await replaceMenuItems('507f1f77bcf86cd799439011', [
+ *   { itemId: 'uuid-1', quantity: 1, allowOptions: true },
+ *   { itemId: 'uuid-2', quantity: 2, allowOptions: false }
+ * ]);
  * ```
  */
-export const addItemToMenu = async (
+export const replaceMenuItems = async (
   id: string,
-  input: AddMenuItemInput
+  items: AddMenuItemInput[]
 ): Promise<ApiResponse<IMenuDocument>> => {
   try {
     // ========================================================================
@@ -52,11 +55,20 @@ export const addItemToMenu = async (
       );
     }
 
-    if (!input.itemId) {
-      throw new ValidationError('Validation failed', 'Item ID is required');
+    if (!Array.isArray(items)) {
+      throw new ValidationError(
+        'Validation failed',
+        'Items must be an array'
+      );
     }
 
-    validateUuid(input.itemId, 'Item ID');
+    // Validate each item
+    for (const item of items) {
+      if (!item.itemId) {
+        throw new ValidationError('Validation failed', 'Each item must have an itemId');
+      }
+      validateUuid(item.itemId, 'Item ID');
+    }
 
     // ========================================================================
     // STEP 2: FIND MENU
@@ -69,33 +81,24 @@ export const addItemToMenu = async (
     }
 
     // ========================================================================
-    // STEP 3: CHECK IF ITEM ALREADY EXISTS
+    // STEP 3: REPLACE ITEMS
     // ========================================================================
 
-    if (menu.hasItem(input.itemId)) {
-      throw new ValidationError(
-        'Duplicate item',
-        `Item ${input.itemId} already exists in this menu`
-      );
-    }
+    const newItems: IMenuItem[] = items.map((item: AddMenuItemInput) => ({
+      itemId: item.itemId,
+      quantity: item.quantity ?? 1,
+      allowOptions: item.allowOptions ?? true,
+    }));
 
-    // ========================================================================
-    // STEP 4: ADD ITEM
-    // ========================================================================
+    menu.items = newItems;
 
-    menu.addItem(
-      input.itemId,
-      input.quantity ?? 1,
-      input.allowOptions ?? true
-    );
-
-    // Pre-save hook will validate itemId exists
+    // Pre-save hook will validate all itemIds exist and remove duplicates
     await menu.save();
 
     return {
       success: true,
       data: menu,
-      message: 'Item added to menu successfully',
+      message: `Menu items replaced successfully. ${menu.items.length} item(s) in menu.`,
     };
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
@@ -107,7 +110,7 @@ export const addItemToMenu = async (
     }
 
     throw new ValidationError(
-      'Error adding item to Menu',
+      'Error replacing Menu items',
       error instanceof Error ? error.message : String(error)
     );
   }
