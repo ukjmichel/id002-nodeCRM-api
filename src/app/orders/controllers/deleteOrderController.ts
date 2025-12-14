@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { deleteOrder } from '../services/order/index.js';
+import { deleteOrder } from '../services/index.js';
 
 /**
  * Delete an order (only cancelled or refunded orders)

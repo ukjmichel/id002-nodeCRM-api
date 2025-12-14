@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { getOrderStats } from '../services/order/index.js';
+import { getOrderStats } from '../services/index.js';
 
 /**
  * Get order statistics

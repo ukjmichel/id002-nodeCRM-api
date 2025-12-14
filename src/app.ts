@@ -26,7 +26,10 @@ import authRouter from './app/auth/routes/auth.route.js';
 import roleRouter from './app/authorisation/routes/role.routes.js';
 import businessRouter from './app/businesses/routes/business.routes.js';
 import ItemRouter from './app/items/routes/item.routes.js';
-import ItemOptionsRouter from './app/item-options/routes/option-group.routes.js';
+import ItemOptionRouter from './app/item-options/routes/item-option.routes.js';
+import OptionGroupRouter from './app/item-options/routes/option-group.routes.js';
+import MenuRouter from './app/menus/routes/menu.route.js';
+import OrderRouter from './app/orders/routes/order.routes.js';
 
 export const app = express();
 
@@ -72,7 +75,10 @@ app.use('/api/auth', authRouter);
 app.use('/api/authorisations', roleRouter);
 app.use('/api/businesses', businessRouter);
 app.use('/api/items', ItemRouter);
-app.use('/api/item-options', ItemOptionsRouter);
+app.use('/api/item-options', ItemOptionRouter);
+app.use('/api/option-groups', OptionGroupRouter);
+app.use('/api/menus', MenuRouter);
+app.use('/api/orders', OrderRouter);
 
 /* -------------------------------------------------------------------------- */
 /* Multer error normalization (optional)                                      */

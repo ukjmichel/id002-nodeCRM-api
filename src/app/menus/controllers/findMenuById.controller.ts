@@ -1,18 +1,15 @@
 /**
  * Find Menu By ID Controller
- * Handles HTTP request for fetching a menu by MongoDB _id
+ * @route GET /api/menus/:id
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { MenuService } from '../services/index.js';
 
 /**
- * Find a menu by its MongoDB _id
+ * Get a menu by MongoDB _id
  * @route GET /api/menus/:id
  * @access Private
- *
- * @example
- * GET /api/menus/507f1f77bcf86cd799439011
  */
 export const findMenuByIdController = async (
   req: Request,

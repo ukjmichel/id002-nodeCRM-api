@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrdersByFulfillmentStatus } from '../services/order/index.js';
+import { findOrdersByFulfillmentStatus } from '../services/index.js';
 import { FulfillmentStatus } from '../interfaces/order.interface.js';
 
 /**

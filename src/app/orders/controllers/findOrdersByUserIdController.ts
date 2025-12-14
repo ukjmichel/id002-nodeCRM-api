@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrdersByUserId } from '../services/order/index.js';
+import { findOrdersByUserId } from '../services/index.js';
 
 /**
  * Get all orders for a specific user

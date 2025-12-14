@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { updateDriverLocation } from '../services/order/index.js';
+import { updateDriverLocation } from '../services/index.js';
 
 /**
  * Update driver location for an order

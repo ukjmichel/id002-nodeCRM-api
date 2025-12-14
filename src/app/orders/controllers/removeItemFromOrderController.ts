@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { removeItemFromOrder } from '../services/order/index.js';
+import { removeItemFromOrder } from '../services/index.js';
 
 /**
  * Remove an item from an order

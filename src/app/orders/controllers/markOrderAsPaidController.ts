@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { markOrderAsPaid } from '../services/order/index.js';
+import { markOrderAsPaid } from '../services/index.js';
 
 /**
  * Mark an order as paid

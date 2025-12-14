@@ -12,8 +12,11 @@
  */
 
 import { Schema, model } from 'mongoose';
-import { IOptionGroupDocument, IOptionGroupItem, IOptionGroupModel } from '../interfaces/option-group.interface.';
-
+import {
+  IOptionGroupDocument,
+  IOptionGroupItem,
+  IOptionGroupModel,
+} from '../interfaces/option-group.interface';
 
 // =========================================================================
 // Sub-Schema for Option Group Items

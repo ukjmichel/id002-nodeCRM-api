@@ -39,9 +39,8 @@ export { queryParamsValidator } from './queryParams.validator.js';
 // Update Validators
 // =============================================================================
 export { updateNameValidator } from './updateName.validator.js';
-export { updateDescriptionValidator } from './updateDescription.validator.js';
 export { updateQuantityValidator } from './updateQuantity.validator.js';
-
+export { updateBusinessValidator } from '../../businesses/validators/updateBusiness.validator.js';
 // =============================================================================
 // Active Options Validators
 // =============================================================================

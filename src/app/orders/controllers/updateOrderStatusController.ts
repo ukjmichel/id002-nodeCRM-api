@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { updateOrderStatus } from '../services/order/index.js';
+import { updateOrderStatus } from '../services/index.js';
 
 /**
  * Update order status

@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
 
 /**
  * Update an option group's description
@@ -25,7 +25,7 @@ export const updateOptionGroupDescriptionController = async (
   try {
     const { optionId } = req.params;
     const { description } = req.body;
-    const result = await OptionGroupService.updateOptionGroupDescription(
+    const result = await OptionGroupService.updateDescription(
       optionId,
       description
     );

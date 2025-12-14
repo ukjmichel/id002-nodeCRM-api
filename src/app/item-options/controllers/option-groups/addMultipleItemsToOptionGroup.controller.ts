@@ -4,7 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
+
 
 /**
  * Add multiple items to an option group at once
@@ -30,7 +31,7 @@ export const addMultipleItemsToOptionGroupController = async (
   try {
     const { optionId } = req.params;
     const { itemIds, defaultMaxQuantity, defaultActive } = req.body;
-    const result = await OptionGroupService.addMultipleItemsToOptionGroup(
+    const result = await OptionGroupService.addMultipleItems(
       optionId,
       itemIds,
       defaultMaxQuantity,

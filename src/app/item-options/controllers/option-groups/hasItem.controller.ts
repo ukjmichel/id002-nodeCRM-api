@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
 
 /**
  * Check if an option group contains a specific item

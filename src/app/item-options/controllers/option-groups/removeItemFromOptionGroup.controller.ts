@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
 
 /**
  * Remove a single item from an option group
@@ -21,7 +21,7 @@ export const removeItemFromOptionGroupController = async (
 ): Promise<void> => {
   try {
     const { optionId, itemId } = req.params;
-    const result = await OptionGroupService.removeItemFromOptionGroup(
+    const result = await OptionGroupService.removeItem(
       optionId,
       itemId
     );

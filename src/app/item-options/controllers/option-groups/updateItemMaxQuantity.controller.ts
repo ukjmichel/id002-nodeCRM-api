@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
 
 /**
  * Update an item's max quantity in an option group

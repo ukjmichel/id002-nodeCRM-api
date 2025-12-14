@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrderById } from '../services/order/index.js';
+import { findOrderById } from '../services/index.js';
 
 /**
  * Get a single order by MongoDB _id

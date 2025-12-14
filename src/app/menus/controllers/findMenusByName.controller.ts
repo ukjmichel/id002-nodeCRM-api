@@ -1,19 +1,15 @@
 /**
  * Find Menus By Name Controller
- * Handles HTTP request for fetching menus by name (partial match)
+ * @route GET /api/menus/search/by-name
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { MenuService } from '../services/index.js';
 
 /**
- * Find menus by name (partial match, case-insensitive)
- * @route GET /api/menus/by-name/:name
+ * Search menus by name
+ * @route GET /api/menus/search/by-name?name=lunch
  * @access Private
- *
- * @example
- * GET /api/menus/by-name/lunch
- * GET /api/menus/by-name/breakfast
  */
 export const findMenusByNameController = async (
   req: Request,
@@ -21,8 +17,8 @@ export const findMenusByNameController = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { name } = req.params;
-    const result = await MenuService.findByName(name);
+    const { name } = req.query;
+    const result = await MenuService.findByName(name as string);
     res.status(200).json(result);
   } catch (error) {
     next(error);

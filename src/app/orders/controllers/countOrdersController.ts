@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { countOrders } from '../services/order/index.js';
+import { countOrders } from '../services/index.js';
 
 /**
  * Count orders with optional filters

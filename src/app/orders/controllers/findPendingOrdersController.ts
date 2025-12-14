@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findPendingOrders } from '../services/order/index.js';
+import { findPendingOrders } from '../services/index.js';
 
 /**
  * Get all pending orders (pending or confirmed status)

@@ -1,18 +1,15 @@
 /**
  * Find Menu By MenuId Controller
- * Handles HTTP request for fetching a menu by its menuId
+ * @route GET /api/menus/by-menu-id/:menuId
  */
 
 import { Request, Response, NextFunction } from 'express';
 import { MenuService } from '../services/index.js';
 
 /**
- * Find a menu by its menuId
+ * Get a menu by custom menuId
  * @route GET /api/menus/by-menu-id/:menuId
  * @access Private
- *
- * @example
- * GET /api/menus/by-menu-id/lunch-menu-001
  */
 export const findMenuByMenuIdController = async (
   req: Request,

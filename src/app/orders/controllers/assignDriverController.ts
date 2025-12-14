@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { assignDriver } from '../services/order/index.js';
+import { assignDriver } from '../services/index.js';
 
 /**
  * Assign a driver to an order

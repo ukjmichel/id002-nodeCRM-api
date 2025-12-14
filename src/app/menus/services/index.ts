@@ -42,6 +42,27 @@ import { getMenuItemCount } from './getMenuItemCount.js';
 import { getItemsWithOptions } from './getItemsWithOptions.js';
 import { getItemsWithoutOptions } from './getItemsWithoutOptions.js';
 
+// Active Option Services
+import { addActiveItemToMenu } from './addActiveItemToMenu.js';
+import { addActiveOptionToMenu } from './addActiveOptionToMenu.js';
+import { addActiveOptionToMenuItem } from './addActiveOptionToMenuItem.js';
+import {
+  addActiveOptionsToMenu,
+  AddActiveOptionsResult,
+} from './addActiveOptionsToMenu.js';
+import {
+  getActiveOptionsForMenu,
+  ActiveOptionForMenu,
+} from './getActiveOptionsForMenu.js';
+import {
+  removeInactiveOptionsFromMenu,
+  RemoveInactiveOptionsResult,
+} from './removeInactiveOptionsFromMenu.js';
+import {
+  syncActiveOptionsForMenu,
+  SyncActiveOptionsResult,
+} from './syncActiveOptionsForMenu.js';
+
 /**
  * Menu Service Interface
  */
@@ -51,8 +72,13 @@ export interface IMenuService {
   findById(id: string): Promise<ApiResponse<IMenuDocument>>;
   findByMenuId(menuId: string): Promise<ApiResponse<IMenuDocument>>;
   findAll(options?: FindAllMenusOptions): Promise<ApiResponse<IMenuDocument[]>>;
-  findOne(filter: FilterQuery<IMenuDocument>): Promise<ApiResponse<IMenuDocument>>;
-  update(id: string, data: UpdateMenuInput): Promise<ApiResponse<IMenuDocument>>;
+  findOne(
+    filter: FilterQuery<IMenuDocument>
+  ): Promise<ApiResponse<IMenuDocument>>;
+  update(
+    id: string,
+    data: UpdateMenuInput
+  ): Promise<ApiResponse<IMenuDocument>>;
   delete(id: string): Promise<ApiResponse<void>>;
   count(filter?: FilterQuery<IMenuDocument>): Promise<ApiResponse<number>>;
 
@@ -61,7 +87,10 @@ export interface IMenuService {
   findByItemId(itemId: string): Promise<ApiResponse<IMenuDocument[]>>;
 
   // Item Management
-  addItem(id: string, input: AddMenuItemInput): Promise<ApiResponse<IMenuDocument>>;
+  addItem(
+    id: string,
+    input: AddMenuItemInput
+  ): Promise<ApiResponse<IMenuDocument>>;
   removeItem(id: string, itemId: string): Promise<ApiResponse<IMenuDocument>>;
   updateItem(
     id: string,
@@ -84,6 +113,37 @@ export interface IMenuService {
   getItemCount(id: string): Promise<ApiResponse<number>>;
   getItemsWithOptions(id: string): Promise<ApiResponse<IMenuItem[]>>;
   getItemsWithoutOptions(id: string): Promise<ApiResponse<IMenuItem[]>>;
+
+  // Active Option Operations
+  addActiveItem(
+    menuId: string,
+    optionId: string,
+    itemId: string
+  ): Promise<ApiResponse<IMenuDocument>>;
+  addActiveOption(
+    menuId: string,
+    optionId: string
+  ): Promise<ApiResponse<IMenuDocument>>;
+  addActiveOptionToItem(
+    menuId: string,
+    itemId: string,
+    optionId: string
+  ): Promise<ApiResponse<IMenuDocument>>;
+  addActiveOptions(
+    menuId: string,
+    optionIds: string[],
+    required?: boolean
+  ): Promise<ApiResponse<AddActiveOptionsResult>>;
+  getActiveOptions(
+    menuId: string,
+    includeInactiveItems?: boolean
+  ): Promise<ApiResponse<ActiveOptionForMenu[]>>;
+  removeInactiveOptions(
+    menuId: string
+  ): Promise<ApiResponse<RemoveInactiveOptionsResult>>;
+  syncActiveOptions(
+    menuId: string
+  ): Promise<ApiResponse<SyncActiveOptionsResult>>;
 }
 
 /**
@@ -155,6 +215,17 @@ export const MenuService: IMenuService = {
   getItemCount: getMenuItemCount,
   getItemsWithOptions: getItemsWithOptions,
   getItemsWithoutOptions: getItemsWithoutOptions,
+
+  // =========================================================================
+  // Active Option Operations
+  // =========================================================================
+  addActiveItem: addActiveItemToMenu,
+  addActiveOption: addActiveOptionToMenu,
+  addActiveOptionToItem: addActiveOptionToMenuItem,
+  addActiveOptions: addActiveOptionsToMenu,
+  getActiveOptions: getActiveOptionsForMenu,
+  removeInactiveOptions: removeInactiveOptionsFromMenu,
+  syncActiveOptions: syncActiveOptionsForMenu,
 };
 
 export default MenuService;
@@ -192,10 +263,23 @@ export {
   getMenuItemCount,
   getItemsWithOptions,
   getItemsWithoutOptions,
+
+  // Active Option Operations
+  addActiveItemToMenu,
+  addActiveOptionToMenu,
+  addActiveOptionToMenuItem,
+  addActiveOptionsToMenu,
+  getActiveOptionsForMenu,
+  removeInactiveOptionsFromMenu,
+  syncActiveOptionsForMenu,
 };
 
 // Re-export types
 export type { FindAllMenusOptions } from './findAllMenus.js';
+export type { AddActiveOptionsResult } from './addActiveOptionsToMenu.js';
+export type { ActiveOptionForMenu } from './getActiveOptionsForMenu.js';
+export type { RemoveInactiveOptionsResult } from './removeInactiveOptionsFromMenu.js';
+export type { SyncActiveOptionsResult } from './syncActiveOptionsForMenu.js';
 export type {
   IMenuDocument,
   IMenuItem,

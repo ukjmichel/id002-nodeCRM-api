@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { cancelOrder } from '../services/order/index.js';
+import { cancelOrder } from '../services/index.js';
 
 /**
  * Cancel an order

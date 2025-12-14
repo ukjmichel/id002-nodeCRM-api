@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { updateFulfillmentStatus } from '../services/order/index.js';
+import { updateFulfillmentStatus } from '../services/index.js';
 
 /**
  * Update fulfillment status (delivery/pickup tracking)

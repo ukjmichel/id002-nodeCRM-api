@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrdersByDriverId } from '../services/order/index.js';
+import { findOrdersByDriverId } from '../services/index.js';
 
 /**
  * Get all orders assigned to a specific driver

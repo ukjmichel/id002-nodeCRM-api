@@ -1,6 +1,6 @@
 /**
- * Find Gluten-Free Items Service
- * Retrieves all gluten-free business items
+ * Find Halal Items Service
+ * Retrieves all halal business items
  */
 
 import { ValidationError } from '../../../core/errors/index.js';
@@ -9,23 +9,23 @@ import { ItemModel } from '../models/item.model.js';
 import { findAllItems } from './findAllItems.js';
 
 /**
- * Find all gluten-free business items
+ * Find all halal business items
  *
  * @param businessId - Optional business ID to filter by
- * @returns Array of gluten-free business items
+ * @returns Array of halal business items
  * @throws {ValidationError} When query fails
  *
  * @example
  * ```typescript
- * const glutenFreeItems = await findGlutenFreeItems();
- * console.log(`Found ${glutenFreeItems.count} gluten-free items`);
+ * const halalItems = await findHalalItems();
+ * console.log(`Found ${halalItems.count} halal items`);
  * ```
  */
-export const findGlutenFreeItems = async (
+export const findHalalItems = async (
   businessId?: string
 ): Promise<ApiResponse<ItemModel[]>> => {
   try {
-    const where: any = { isGlutenFree: true, available: true };
+    const where: any = { isHalal: true, available: true };
 
     if (businessId) {
       where.businessId = businessId;
@@ -41,11 +41,11 @@ export const findGlutenFreeItems = async (
 
     return {
       ...result,
-      message: 'Gluten-free items retrieved successfully',
+      message: 'Halal items retrieved successfully',
     };
   } catch (error) {
     throw new ValidationError(
-      'Error fetching gluten-free items',
+      'Error fetching halal items',
       error instanceof Error ? error.message : String(error)
     );
   }

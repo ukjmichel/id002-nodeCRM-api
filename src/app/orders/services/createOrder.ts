@@ -5,7 +5,7 @@
 
 import { ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-import { validateUuid } from '../../../core/utils/index.js';
+import { validateUuid } from '../../../core/utils/uuidValidator.js';
 import { OrderModel } from '../models/order.model.js';
 import {
   IOrderDocument,

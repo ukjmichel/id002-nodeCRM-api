@@ -19,6 +19,24 @@ export interface IMenuItem {
   quantity: number;
   /** Whether options are allowed for this item in this menu */
   allowOptions: boolean;
+  /** Array of optionId references to OptionGroup documents */
+  optionIds?: string[];
+  /** Sort order within the menu */
+  sortOrder?: number;
+  /** Whether this item is active in this menu */
+  active?: boolean;
+}
+
+/**
+ * Interface for menu option group reference
+ */
+export interface IMenuOptionGroup {
+  /** Reference to OptionGroup optionId */
+  optionId: string;
+  /** Sort order within the menu */
+  sortOrder?: number;
+  /** Whether this option group is required */
+  required?: boolean;
 }
 
 /**
@@ -29,6 +47,8 @@ export interface IMenu {
   name: string;
   description: string;
   items: IMenuItem[];
+  /** Option groups available for this menu */
+  optionGroups?: IMenuOptionGroup[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -50,6 +70,12 @@ export interface IMenuDocument extends IMenu, Document {
   getItemsWithoutOptions(): IMenuItem[];
   getItemIds(): string[];
   getTotalQuantity(): number;
+
+  // Option management methods
+  addOptionToItem(itemId: string, optionId: string): boolean;
+  removeOptionFromItem(itemId: string, optionId: string): boolean;
+  getItemOptions(itemId: string): string[];
+  hasItemOption(itemId: string, optionId: string): boolean;
 }
 
 /**
@@ -70,6 +96,7 @@ export interface CreateMenuInput {
   name: string;
   description: string;
   items?: IMenuItem[];
+  optionGroups?: IMenuOptionGroup[];
 }
 
 /**
@@ -79,6 +106,7 @@ export interface UpdateMenuInput {
   name?: string;
   description?: string;
   items?: IMenuItem[];
+  optionGroups?: IMenuOptionGroup[];
 }
 
 /**
@@ -88,6 +116,9 @@ export interface AddMenuItemInput {
   itemId: string;
   quantity?: number;
   allowOptions?: boolean;
+  optionIds?: string[];
+  sortOrder?: number;
+  active?: boolean;
 }
 
 /**
@@ -103,4 +134,16 @@ export interface BulkAddMenuItemsInput {
 export interface UpdateMenuItemInput {
   quantity?: number;
   allowOptions?: boolean;
+  optionIds?: string[];
+  sortOrder?: number;
+  active?: boolean;
+}
+
+/**
+ * Input for adding an option group to menu
+ */
+export interface AddMenuOptionGroupInput {
+  optionId: string;
+  sortOrder?: number;
+  required?: boolean;
 }

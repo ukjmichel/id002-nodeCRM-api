@@ -4,7 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
+
 
 /**
  * Add a single item to an option group
@@ -27,7 +28,7 @@ export const addItemToOptionGroupController = async (
   try {
     const { optionId } = req.params;
     const { itemId, maxQuantity, active } = req.body;
-    const result = await OptionGroupService.addItemToOptionGroup(
+    const result = await OptionGroupService.addItem(
       optionId,
       itemId,
       maxQuantity,

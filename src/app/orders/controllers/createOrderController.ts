@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { createOrder } from '../services/order/index.js';
+import { createOrder } from '../services/index.js';
 
 /**
  * Create a new order

@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrdersByBusinessId } from '../services/order/index.js';
+import { findOrdersByBusinessId } from '../services/index.js';
 
 /**
  * Get all orders for a specific business

@@ -5,7 +5,7 @@
 
 import { NotFoundError, ValidationError } from '../../../core/errors/index.js';
 import { ApiResponse } from '../../../core/interfaces/index.js';
-import { validateUuid } from '../../../core/utils/index.js';
+import { validateUuid } from '../../../core/utils/uuidValidator.js';
 import { MenuModel } from '../models/menu.model.js';
 import { IMenuDocument, UpdateMenuItemInput } from '../interfaces/menu.interface.js';
 

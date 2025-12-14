@@ -418,7 +418,7 @@ export const bulkCreateItems = async (
         availableForDineIn: data.availableForDineIn ?? true,
 
         minOrderQuantity: data.minOrderQuantity ?? 1,
-        displayOrder: data.displayOrder ?? 0,
+        sortOrder: data.sortOrder ?? 0,
         featured: data.featured ?? false,
       };
 

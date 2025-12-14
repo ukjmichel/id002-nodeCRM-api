@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findAllOrders } from '../services/order/index.js';
+import { findAllOrders } from '../services/index.js';
 
 /**
  * Get all orders with optional filters and pagination

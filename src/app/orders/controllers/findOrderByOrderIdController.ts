@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findOrderByOrderId } from '../services/order/index.js';
+import { findOrderByOrderId } from '../services/index.js';
 
 /**
  * Get a single order by orderId (e.g., ORD-20240101-00001)

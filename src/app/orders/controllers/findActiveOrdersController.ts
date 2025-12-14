@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { findActiveOrders } from '../services/order/index.js';
+import { findActiveOrders } from '../services/index.js';
 
 /**
  * Get all active orders (not completed, cancelled, or refunded)

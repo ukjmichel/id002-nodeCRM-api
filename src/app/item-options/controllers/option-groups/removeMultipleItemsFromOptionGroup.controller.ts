@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { OptionGroupService } from '../services/option-group/index.js';
+import OptionGroupService from '../../services/option-groups/index.js';
 
 /**
  * Remove multiple items from an option group at once
@@ -28,7 +28,7 @@ export const removeMultipleItemsFromOptionGroupController = async (
   try {
     const { optionId } = req.params;
     const { itemIds } = req.body;
-    const result = await OptionGroupService.removeMultipleItemsFromOptionGroup(
+    const result = await OptionGroupService.removeMultipleItems(
       optionId,
       itemIds
     );
